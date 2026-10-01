@@ -1,13 +1,13 @@
+<p align="right">
+  <b>English</b> · <a href="README_RU.md">Русский</a>
+</p>
+
 <p align="center">
   <img src="assets/banner.svg" alt="True Unity Agent" width="760">
 </p>
 
 <p align="center">
   <em>Sees your 200-line manager. Writes three lines. Compiles cleanly.</em>
-</p>
-
-<p align="center">
-  <a href="README_RU.md">Читать на русском</a>
 </p>
 
 <p align="center">
