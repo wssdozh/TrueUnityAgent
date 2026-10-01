@@ -1,6 +1,6 @@
 # START.md — Project Self-Adaptation Protocol for Autonomous Agents
 
-> This file is read by autonomous AI agents when bootstrapping `true-unity-agent` rules in a new or existing Unity project.  
+> This file is read by autonomous AI agents when bootstrapping `TrueUnityAgent` rules in a new or existing Unity project.  
 > **Agent Objective**: Autonomously inspect the project, identify its active technology stack and directory layout, and adapt project context files (`AGENTS.md` / `CLAUDE.md`).
 
 ---

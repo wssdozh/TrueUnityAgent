@@ -31,7 +31,7 @@ Enforces minimal working C# code, mandates root-cause fixes over superficial nul
 Send this prompt to your AI agent:
 
 ```text
-Include rules from https://github.com/wssdozh/true-unity-agent into .agents, read START.md, and adapt project context for this repository.
+Include rules from https://github.com/wssdozh/TrueUnityAgent into .agents, read START.md, and adapt project context for this repository.
 ```
 
 The agent will pull the rules, inspect `manifest.json`, detect your stack (URP, Input System, UniTask, DI/ECS), map your `Assets/` layout, and configure `AGENTS.md` autonomously.

@@ -31,7 +31,7 @@
 Скинь этот промпт своему агенту:
 
 ```text
-Подключи правила из https://github.com/wssdozh/true-unity-agent в .agents, прочитай START.md и адаптируй контекст под этот проект.
+Подключи правила из https://github.com/wssdozh/TrueUnityAgent в .agents, прочитай START.md и адаптируй контекст под этот проект.
 ```
 
 Агент сам подтянет правила, прочитает `manifest.json`, определит стек (URP, Input System, UniTask, DI/ECS), разметит границы папок `Assets/` и запишет готовый рабочий контекст в `AGENTS.md`.

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Установщик универсальных правил true-unity-agent в целевой Unity-проект.
+    Установщик универсальных правил TrueUnityAgent в целевой Unity-проект.
 
 .DESCRIPTION
     Копирует модульные правила (.agents/rules/), точки входа (CLAUDE.md, AGENTS.md, .cursorrules)
@@ -22,7 +22,7 @@ param (
 $ErrorActionPreference = "Stop"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "   true-unity-agent installer" -ForegroundColor Yellow
+Write-Host "   TrueUnityAgent installer" -ForegroundColor Yellow
 Write-Host "========================================" -ForegroundColor Cyan
 
 $SourceDir = $PSScriptRoot
@@ -82,4 +82,4 @@ foreach ($file in $templateEntryFiles) {
 }
 
 Write-Host ""
-Write-Host "Готово. Правила и шаблоны true-unity-agent скопированы в $TargetPath" -ForegroundColor Green
+Write-Host "Готово. Правила и шаблоны TrueUnityAgent скопированы в $TargetPath" -ForegroundColor Green
