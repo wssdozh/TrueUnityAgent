@@ -47,7 +47,7 @@ The agent will pull the rules, inspect `manifest.json`, detect your stack (URP, 
 - **Root-Cause Fixing (No Crutches)**  
   Masking bugs with blind `if (x != null)` checks across callers or empty `try/catch` blocks is prohibited. Trace issues back through the call stack and resolve them once at the data source.
 
-- **The Ponytail Simplicity Ladder**  
+- **The [Ponytail](https://github.com/dietrichgebert/ponytail) Simplicity Ladder**  
   Occam's razor against overengineering. Solutions are evaluated strictly from the bottom up: YAGNI ➔ existing project classes ➔ C# stdlib (`Mathf`, `Span<T>`) ➔ Unity native API ➔ installed packages ➔ single-line solution ➔ and only then new code. No empty abstractions or single-implementation interfaces.
 
 - **YAML Safety & Unity CLI**  
@@ -66,7 +66,7 @@ The agent will pull the rules, inspect `manifest.json`, detect your stack (URP, 
 | Module | Domain | Description |
 | :--- | :--- | :--- |
 | [`readiness-and-delivery.md`](./rules/readiness-and-delivery.md) | **Workflow** | Feature Gate ($\ge 90\%$), developer interview protocol, autonomous execution, DoD, Cross-Agent Handoff. |
-| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Workflow** | Ponytail ladder, root-cause fixes (No Crutches), 3-attempts rule against infinite loops. |
+| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Workflow** | [Ponytail](https://github.com/dietrichgebert/ponytail) ladder, root-cause fixes (No Crutches), 3-attempts rule against infinite loops. |
 | [`git-workflow.md`](./rules/git-workflow.md) | **Workflow** | Branching strategy (`feature/*`, `fix/*`), paired `.meta` integrity, English Conventional Commits. |
 | [`code-style.md`](./rules/code-style.md) | **Engineering** | Entity-first naming (`playerHealth`), explicit types over `var`, whitespace (Allman braces), UniTask standards. |
 | [`architecture-design.md`](./rules/architecture-design.md) | **Engineering** | Factory decoupled from Spawner, Single State Owner, rich domain models, narrow interfaces (ISP), Composition Root. |

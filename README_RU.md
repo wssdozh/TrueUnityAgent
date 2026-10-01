@@ -47,7 +47,7 @@
 - **Поиск первопричины (Root-Cause Fix)**  
   Запрещено маскировать баги слепыми проверками `if (x != null)` по десяти местам или пустыми блоками `try/catch`. Проблема исследуется по всему стеку вызовов и устраняется один раз в источнике данных.
 
-- **Лестница простоты Ponytail**  
+- **Лестница простоты [Ponytail](https://github.com/dietrichgebert/ponytail)**  
   Бритва Оккама против оверинжиниринга. Агент ищет решение строго снизу вверх: YAGNI ➔ готовые классы проекта ➔ C# stdlib (`Mathf`, `Span<T>`) ➔ Unity API ➔ установленный пакет ➔ одна строка ➔ и только потом новый код. Никаких пустых абстракций и интерфейсов с одной реализацией.
 
 - **Безопасность YAML и Unity CLI**  
@@ -66,7 +66,7 @@
 | Модуль | Область | Описание |
 | :--- | :--- | :--- |
 | [`readiness-and-delivery.md`](./rules/readiness-and-delivery.md) | **Workflow** | Feature Gate ($\ge 90\%$), протокол опроса разработчика, автономная доставка, DoD, Handoff. |
-| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Workflow** | Лестница Ponytail, поиск первопричины (No Crutches), правило 3 попыток против зацикливания. |
+| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Workflow** | Лестница [Ponytail](https://github.com/dietrichgebert/ponytail), поиск первопричины (No Crutches), правило 3 попыток против зацикливания. |
 | [`git-workflow.md`](./rules/git-workflow.md) | **Workflow** | Стратегия веток (`feature/*`, `fix/*`), целостность парных `.meta` файлов, Conventional Commits. |
 | [`code-style.md`](./rules/code-style.md) | **Engineering** | Именование `playerHealth`, явные типы вместо `var`, whitespace (пустые строки, скобки Allman), UniTask. |
 | [`architecture-design.md`](./rules/architecture-design.md) | **Engineering** | Factory отдельно от Spawner, Single State Owner, доменные модели, узкие интерфейсы (ISP), Composition Root. |
