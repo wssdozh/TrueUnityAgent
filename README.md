@@ -2,8 +2,6 @@
   <img src="assets/banner.svg" alt="True Unity Agent" width="760">
 </p>
 
-<h1 align="center">True Unity Agent</h1>
-
 <p align="center">
   <em>Sees your 200-line manager. Writes three lines. Compiles cleanly.</em>
 </p>
