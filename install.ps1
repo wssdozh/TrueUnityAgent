@@ -51,8 +51,8 @@ $DestRulesDir = Join-Path $DestAgentsDir "rules"
 New-Item -ItemType Directory -Path $DestRulesDir -Force | Out-Null
 Write-Host "✓ Создана структура папок .agents/rules/" -ForegroundColor Green
 
-# 3. Копируем модульные правила
-$SourceRules = Join-Path $TemplatesDir ".agents\rules"
+# 3. Копируем модульные правила напрямую из rules/
+$SourceRules = Join-Path $SourceDir "rules"
 Get-ChildItem -Path $SourceRules -Filter "*.md" | ForEach-Object {
     $destFile = Join-Path $DestRulesDir $_.Name
     Copy-Item -Path $_.FullName -Destination $destFile -Force
@@ -65,9 +65,16 @@ if (Test-Path $sourceAgentsReadme) {
     Copy-Item -Path $sourceAgentsReadme -Destination (Join-Path $DestAgentsDir "README.md") -Force
 }
 
-# 4. Копируем точки входа: START.md, CLAUDE.md, AGENTS.md, .cursorrules
-$entryFiles = @("START.md", "CLAUDE.md", "AGENTS.md", ".cursorrules")
-foreach ($file in $entryFiles) {
+# 4. Копируем точки входа: START.md из корня, остальные из templates/
+$startSrc = Join-Path $SourceDir "START.md"
+$startDest = Join-Path $TargetPath "START.md"
+if (Test-Path $startSrc) {
+    Copy-Item -Path $startSrc -Destination $startDest -Force
+    Write-Host "✓ Установлен START.md" -ForegroundColor Green
+}
+
+$templateEntryFiles = @("CLAUDE.md", "AGENTS.md", ".cursorrules")
+foreach ($file in $templateEntryFiles) {
     $src = Join-Path $TemplatesDir $file
     $dest = Join-Path $TargetPath $file
     if (Test-Path $src) {
