@@ -1,8 +1,8 @@
 # true-unity-agent
 
-Инструкции, правила кода и шаблоны для автономных агентов (Claude Code, DeepSeek Harness, Cursor, Windsurf) в проектах на Unity 6+.
+Инструкции, архитектурные правила и шаблоны для автономных агентов (Claude Code, DeepSeek Harness, Cursor, Windsurf) в проектах на Unity 6+.
 
-Репозиторий решает частые проблемы, когда агент работает с Unity напрямую: ломает сцены и префабы ручной правкой YAML, плодит слепые `GetComponent`, забивает кучу аллокациями и зацикливается на ошибках компиляции.
+Репозиторий предотвращает скрытые баги и хаос: запрещает ручную порчу YAML сцен/префабов, блокирует выдумывание геймдизайна агентом, изолирует UI-разработку и исключает накопление костылей.
 
 ---
 
@@ -10,13 +10,16 @@
 
 | Файл | Назначение |
 | :--- | :--- |
-| [`code-style.md`](./rules/code-style.md) | **C# код-стайл**: явные типы вместо `var`, приватные поля `_camelCase`, константы `UPPER_SNAKE_CASE`, асинхронность только на `UniTask` с суффиксом `Async` (без `Task` и `async void`), явная проверка `if (x == false)`. |
-| [`unity-best-practices.md`](./rules/unity-best-practices.md) | **Практики Unity**: запрет `GameObject` в сериализации (ссылаемся сразу на нужный компонент), `TryGetComponent` вместо `GetComponent`, проверка дистанций через `sqrMagnitude`, пулинг для спавна и кэш задержек. |
-| [`unity-cli.md`](./rules/unity-cli.md) | **Работа с редактором**: запрет править `.unity` и `.prefab` руками как текст. Сборка сцены и спавн через `unity command`, проверка через `unity recompile` и чтение ошибок из консоли редактора. |
-| [`project-structure.md`](./rules/project-structure.md) | **Структура файлов**: весь пользовательский код и ассеты живут строго в `Assets/_Project/`. Именование материалов (`M_*`), шейдеров (`SH_*`), звуков (`sfx_*`), изоляция сборок через `asmdef`. |
-| [`grill-me.md`](./rules/grill-me.md) | **Чек-лист перед кодом**: сбор вводных (платформа, стек, объемы в рантайме) и уточнение развилок у разработчика до написания классов. |
-| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Защита от оверинжиниринга**: YAGNI, использование готового Unity API и C# stdlib вместо велосипедов, лимит 3 попыток исправления ошибок сборки. |
+| [`readiness-and-delivery.md`](./rules/readiness-and-delivery.md) | **Регламент и Feature Gate**: разграничение ролей (человек/агент), обязательный Feature Readiness Gate ($\ge 90\%$), автономная доставка без микро-пауз, Cross-Agent Handoff и Definition of Done. |
+| [`architecture-design.md`](./rules/architecture-design.md) | **Архитектура и владение**: разделение Factory (создание) и Spawner (тайминги/позиции), Single State Owner, доменные модели вместо анемичных структур, узкие интерфейсы (ISP), Composition Root. |
+| [`code-style.md`](./rules/code-style.md) | **C# код-стайл**: именование от сущности к свойству (`playerHealth`), явные типы вместо `var`, приватные поля `_camelCase`, чистые геттеры, разграничение `ArgumentException` и `InvalidOperationException`, асинхронность только на `UniTask`. |
+| [`unity-best-practices.md`](./rules/unity-best-practices.md) | **Практики Unity**: `ScriptableObject` как строго неизменяемый конфиг в рантайме, запрет тихих `return` для обязательных ссылок, контракт сброса пула (физика/твины), изоляция Animator, `TryGetComponent`, `sqrMagnitude`. |
+| [`ui-toolkit-pipeline.md`](./rules/ui-toolkit-pipeline.md) | **UI Toolkit пайплайн**: 2-этапное согласование (сначала интерактивный HTML/CSS макет в браузере ➔ аппрув ➔ перенос в Unity), Layout-контракт 95% (запрет отсебятины), UXML + USS + retained-mode C#. |
+| [`unity-cli.md`](./rules/unity-cli.md) | **Работа с редактором**: запрет править `.unity` и `.prefab` руками как текст. Сборка сцены через `unity command`, проверка через `unity recompile` и мониторинг ошибок в консоли редактора. |
+| [`project-structure.md`](./rules/project-structure.md) | **Структура файлов**: Zero Junk Policy — весь пользовательский код и ассеты живут строго в `Assets/_Project/`. Именование материалов (`M_*`), шейдеров (`SH_*`), звуков (`sfx_*`), изоляция сборок через `asmdef`. |
+| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Защита от оверинжиниринга и костылей**: 7-ступенчатая лестница Ponytail (YAGNI, использование готового API), протокол поиска первопричины (No Crutches Policy), лимит 3 попыток исправления ошибок. |
 | [`git-workflow.md`](./rules/git-workflow.md) | **Git и безопасность**: стратегия веток (`feature/*`, `fix/*`, `backup/*`), защита парных `.meta`-файлов, Conventional Commits на английском и пре-мерж проверки. |
+| [`grill-me.md`](./rules/grill-me.md) | **Чек-лист перед кодом**: сбор вводных (платформа, стек, объемы в рантайме) и уточнение развилок у разработчика до написания классов. |
 
 ---
 

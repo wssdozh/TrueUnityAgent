@@ -1,6 +1,7 @@
 # CLAUDE.md — Universal Unity Project Agent Guide
 
-> Руководство для Claude Code и автономных ИИ-агентов при работе с проектом на Unity.
+> Руководство для Claude Code и автономных ИИ-агентов при работе с проектом на Unity.  
+> Главный источник правил проекта: **`AGENTS.md`** и папка **`.agents/rules/`**.
 
 ---
 
@@ -28,19 +29,21 @@
 ## Навигация по правилам (`.agents/rules/`)
 
 Перед выполнением задач обращайся к профильным правилам:
-1. **Пишешь C# код?** ➔ читай `.agents/rules/code-style.md`
-2. **Пишешь Unity-логику или физику?** ➔ читай `.agents/rules/unity-best-practices.md`
-3. **Управляешь сценами или компиляцией?** ➔ читай `.agents/rules/unity-cli.md` (никакого ручного редактирования YAML сцен!)
-4. **Создаешь новые файлы или структуру?** ➔ читай `.agents/rules/project-structure.md`
-5. **Планируешь механику?** ➔ запускай интервью по `.agents/rules/grill-me.md`
-6. **Застрял на ошибке?** ➔ следуй протоколу `.agents/rules/anti-deadlock.md` (правило 3 попыток, Ponytail)
-7. **Делаешь коммиты или ветки?** ➔ читай `.agents/rules/git-workflow.md` (сохранность `.meta`, Conventional Commits на английском)
+1. **Регламент и гейт фич** ➔ читай `.agents/rules/readiness-and-delivery.md` (Feature Gate $\ge 90\%$, автономность, DoD)
+2. **Пишешь C# код?** ➔ читай `.agents/rules/code-style.md`
+3. **Архитектура и связи?** ➔ читай `.agents/rules/architecture-design.md` (Factory vs Spawner, Single State Owner, ISP)
+4. **Пишешь Unity-логику или физику?** ➔ читай `.agents/rules/unity-best-practices.md` (неизменяемость SO, контракт сброса пула)
+5. **Делаешь UI?** ➔ читай `.agents/rules/ui-toolkit-pipeline.md` (HTML мокап в браузере, Layout-контракт 95%)
+6. **Управляешь сценами или компиляцией?** ➔ читай `.agents/rules/unity-cli.md` (никакого ручного редактирования YAML сцен!)
+7. **Создаешь новые файлы или структуру?** ➔ читай `.agents/rules/project-structure.md`
+8. **Застрял на ошибке?** ➔ следуй протоколу `.agents/rules/anti-deadlock.md` (первопричина вместо костылей, Ponytail)
+9. **Делаешь коммиты или ветки?** ➔ читай `.agents/rules/git-workflow.md` (сохранность `.meta`, Conventional Commits на английском)
 
 ---
 
 ## Рабочий цикл агента
 
-1. **Перед кодингом**: собери вводные (платформа, стек, масштабы) и согласуй развилки.
+1. **Перед кодингом**: собери вводные и сформируй карточку Feature Readiness ($\ge 90\%$ уверенности).
 2. **Во время работы со сценой**: проверяй `unity status`. Если редактор активен — управляй через `unity command`.
 3. **После написания C# кода**:
    - Вызови `unity recompile --project-path .`
