@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="160" height="160" fill="none">
+  <style>
+    .stroke-main { stroke: #18181b; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .stroke-sub { stroke: #71717a; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .fill-accent { fill: #18181b; }
+    .dash-line { stroke: #a1a1aa; stroke-width: 1.5; stroke-dasharray: 4, 4; }
+
+    @media (prefers-color-scheme: dark) {
+      .stroke-main { stroke: #f4f4f5; }
+      .stroke-sub { stroke: #a1a1aa; }
+      .fill-accent { fill: #f4f4f5; }
+      .dash-line { stroke: #52525b; }
+    }
+  </style>
+
+  <!-- Outer Isometric Hexagon (Cube Bounds) -->
+  <polygon points="100,28 162,64 162,136 100,172 38,136 38,64" class="stroke-main" />
+
+  <!-- Inner Axes -->
+  <line x1="100" y1="100" x2="100" y2="172" class="stroke-main" />
+  <line x1="100" y1="100" x2="38" y2="64" class="stroke-main" />
+  <line x1="100" y1="100" x2="162" y2="64" class="stroke-main" />
+
+  <!-- Precision Inset Geometry: Top Face -->
+  <polygon points="100,44 144,70 100,94 56,70" class="stroke-sub" />
+
+  <!-- Precision Inset Geometry: Left Face -->
+  <polygon points="50,78 92,102 92,154 50,130" class="stroke-sub" />
+
+  <!-- Precision Inset Geometry: Right Face (Solid Brutalist Accent) -->
+  <polygon points="108,102 150,78 150,130 108,154" class="stroke-sub" />
+
+  <!-- Center Core Anchor -->
+  <circle cx="100" cy="100" r="4.5" class="fill-accent" />
+</svg>

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="true-unity-agent" width="760">
+  <img src="assets/logo.svg" alt="true-unity-agent logo" width="140">
 </p>
 
 <h1 align="center">true-unity-agent</h1>
