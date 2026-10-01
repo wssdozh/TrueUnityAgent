@@ -59,12 +59,6 @@ Get-ChildItem -Path $SourceRules -Filter "*.md" | ForEach-Object {
     Write-Host "  → Скопировано правило: $($_.Name)" -ForegroundColor Gray
 }
 
-# Копируем .agents/README.md
-$sourceAgentsReadme = Join-Path $TemplatesDir ".agents\README.md"
-if (Test-Path $sourceAgentsReadme) {
-    Copy-Item -Path $sourceAgentsReadme -Destination (Join-Path $DestAgentsDir "README.md") -Force
-}
-
 # 4. Копируем точки входа: START.md из корня, остальные из templates/
 $startSrc = Join-Path $SourceDir "START.md"
 $startDest = Join-Path $TargetPath "START.md"
