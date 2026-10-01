@@ -44,4 +44,4 @@
 3. **После написания C# кода**:
    - Вызови `unity recompile --project-path .`
    - Проверь ошибки: `unity command console --level error --tail 20`
-4. **Коммиты**: атомарные, осмысленные, на русском языке (Conventional Commits: `feat:`, `fix:`, `refactor:`, `chore:`).
+4. **Коммиты**: атомарные, осмысленные, на английском языке по стандарту Conventional Commits (`feat:`, `fix:`, `refactor:`, `chore:`).
