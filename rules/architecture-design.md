@@ -2,59 +2,59 @@
 paths: ["**/*.cs"]
 ---
 
-# Архитектура и владение состоянием
+# Architecture & State Ownership
 
-> Принципы распределения ответственности, владения состоянием и связности подсистем в Unity.
+> Principles of responsibility distribution, state ownership, and subsystem decoupling in Unity.
 
 ---
 
-## 1. Разделение Фабрики (`Factory`) и Спавнера (`Spawner`)
+## 1. Separation of Factory and Spawner
 
-Это две разные ответственности, которые нельзя смешивать в одном классе:
+These are two distinct responsibilities that must never be mixed in a single class:
 
-- **Фабрика (`Factory`)**:
-  - Отвечает за создание и сборку объекта.
-  - Знает префаб, инстанцирует его, передает зависимости (`Construct` / `Initialize`) и возвращает готовый экземпляр.
-  - Не знает координаты спавна на сцене, текущее количество врагов и интервалы между волнами.
-- **Спавнер (`Spawner`)**:
-  - Отвечает за ритм и размещение в игровом мире.
-  - Хранит координаты точек появления, таймеры волн и лимиты популяции.
-  - Для создания сущности вызывает фабрику:
+- **Factory (`Factory`)**:
+  - Responsible for object instantiation and assembly.
+  - Knows the prefab, instantiates it, injects dependencies (`Construct` / `Initialize`), and returns the ready instance.
+  - Unaware of scene spawn coordinates, current enemy counts, or wave intervals.
+- **Spawner (`Spawner`)**:
+  - Responsible for game world pacing and placement.
+  - Tracks spawn point transforms, wave timers, and population limits.
+  - Calls the factory to create instances:
   ```csharp
   Enemy enemy = _enemyFactory.Create(spawnPoint.position, spawnPoint.rotation);
   ```
 
 ---
 
-## 2. Единый владелец состояния (Single State Owner)
+## 2. Single State Owner
 
-У каждого изменяемого фрагмента данных есть один класс-владелец:
+Every piece of mutable data has exactly one owning class:
 
-- **Кошелек (`Wallet`)** — единственный владелец валюты. Внешний код не меняет баланс напрямую, а вызывает метод: `wallet.TrySpend(cost)`.
-- **Здоровье (`Health`)** — единственный владелец очков прочности.
-- **Инвентарь (`Inventory`)** — единственный владелец списка предметов.
+- **Wallet (`Wallet`)** — sole owner of currency. External code never modifies balances directly; it invokes methods: `wallet.TrySpend(cost)`.
+- **Health (`Health`)** — sole owner of durability points.
+- **Inventory (`Inventory`)** — sole owner of item collections.
 
-**Запрещены круговые зависимости и размазывание логики**:
-Если сущность А запрашивает предмет у сущности Б, проверка лимитов и списание происходят внутри сущности Б, а не на стороне вызывающего кода.
+**Circular dependencies and logic smear are prohibited**:
+If entity A requests an item from entity B, limit validation and deduction execute inside entity B, never on the caller's side.
 
 ---
 
-## 3. Доменная модель против анемичных структур
+## 3. Domain Model vs Anemic Structures
 
-Не превращай классы в пассивные контейнеры данных с десятком геттеров/сеттеров, вокруг которых внешний код делает всю работу:
+Do not reduce classes to passive data bags with dozens of getters/setters surrounded by external controllers performing all operations:
 
-- **Неправильно (анемичный класс)**:
+- **Incorrect (anemic class)**:
   ```csharp
-  // Внешний контроллер сам всё проверяет и правит чужие поля:
+  // External controller inspects everything and mutates external fields:
   if (cart.Items.Count < cart.MaxCapacity && warehouse.StockCount >= requestedAmount)
   {
       cart.Items.Add(item);
       warehouse.StockCount -= requestedAmount;
   }
   ```
-- **Правильно (доменная модель с поведением)**:
+- **Correct (rich domain model with behavior)**:
   ```csharp
-  // Проверки и инварианты инкапсулированы внутри доменных сущностей:
+  // Validation and invariants are encapsulated within domain entities:
   if (warehouse.TryTake(productId, count, out Product product))
   {
       if (cart.TryAdd(product) == false)
@@ -66,38 +66,38 @@ paths: ["**/*.cs"]
 
 ---
 
-## 4. Принцип разделения интерфейсов (ISP)
+## 4. Interface Segregation Principle (ISP)
 
-Не передавай объекту монолитный интерфейс всей системы, если ему нужна одна функция:
+Do not pass monolithic system interfaces to objects that require a single capability:
 
-- Башне нужен не весь `PlayerInventory`, а узкий `IAmmoProvider`.
-- Магазину нужен не весь `Warehouse`, а `IProductCatalog` для цен и `IProductDispenser` для выдачи.
-- Это изолирует модули и исключает случайную порчу чужого состояния.
-
----
-
-## 5. Точка входа (Composition Root & Entry Point)
-
-1. **Никакой самозарождающейся логики**:
-   - Случайные связывания между объектами через `Start()` вызывают плавающие баги порядка кадров (`Script Execution Order`).
-2. **Явная точка сборки**:
-   - Каждая сцена или игровой режим имеет точку входа (`Bootstrap` / `EntryPoint`).
-   - Точка входа создает сервисы, собирает граф зависимостей и запускает цикл игры в детерминированном порядке.
+- A tower needs a narrow `IAmmoProvider`, not the entire `PlayerInventory`.
+- A shop needs `IProductCatalog` for prices and `IProductDispenser` for dispensing, not the entire `Warehouse`.
+- This isolates modules and prevents accidental corruption of unrelated state.
 
 ---
 
-## 6. Запрет скрытых синглтонов и статики
+## 5. Composition Root & Entry Point
 
-1. **Не использовать статическую бизнес-логику**:
-   - `GameManager.Instance.Player.Wallet.AddMoney(...)` создает скрытые глобальные зависимости, которые невозможно протестировать или подменить.
-   - Зависимости передаются явно: через конструкторы в чистом C#, через метод `Initialize(...)` или через DI-контейнер.
-2. **Исключение**:
-   - Чистые математические утилиты без внутреннего состояния (`Mathf`, `Vector3`).
+1. **No spontaneous execution**:
+   - Ad-hoc wiring across objects via `Start()` introduces non-deterministic frame bugs (`Script Execution Order`).
+2. **Explicit assembly point**:
+   - Every scene or game mode defines an entry point (`Bootstrap` / `EntryPoint`).
+   - The entry point creates services, wires the dependency graph, and initiates the game loop in deterministic order.
 
 ---
 
-## 7. Конечные автоматы (FSM) вместо простыней флагов
+## 6. Prohibition of Hidden Singletons and Statics
 
-Если у сущности больше двух взаимоисключающих состояний:
-- Не заводи цепочки флагов: `bool _isAttacking`, `bool _isStunned`, `bool _isDashing`, `bool _isDead`.
-- Выделяй состояния в явный конечный автомат (FSM / State Pattern). В любой момент времени активно ровно одно состояние (`IdleState`, `AttackState`, `StunnedState`), переходы между ними валидируются централизованно.
+1. **Do not use static business logic**:
+   - `GameManager.Instance.Player.Wallet.AddMoney(...)` creates hidden global dependencies that cannot be tested or mocked.
+   - Pass dependencies explicitly: via constructors in pure C#, via `Initialize(...)` methods, or through a DI container.
+2. **Exception**:
+   - Pure stateless mathematical utilities (`Mathf`, `Vector3`).
+
+---
+
+## 7. Finite State Machines (FSM) over Flag Chains
+
+When an entity has more than two mutually exclusive states:
+- Do not accumulate boolean flags: `bool _isAttacking`, `bool _isStunned`, `bool _isDashing`, `bool _isDead`.
+- Encapsulate states in an explicit Finite State Machine (FSM / State Pattern). Exactly one state is active at any time (`IdleState`, `AttackState`, `StunnedState`), and transitions are validated centrally.

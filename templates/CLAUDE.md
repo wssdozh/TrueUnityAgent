@@ -1,51 +1,51 @@
 # CLAUDE.md — Universal Unity Project Agent Guide
 
-> Руководство для Claude Code и автономных ИИ-агентов при работе с проектом на Unity.  
-> Главный источник правил проекта: **`AGENTS.md`** и папка **`.agents/rules/`**.
+> Guide for Claude Code, DeepSeek Harness, and autonomous AI agents working on Unity projects.  
+> Primary source of truth: **`AGENTS.md`** and the **`.agents/rules/`** directory.
 
 ---
 
-## Контекст проекта
+## Project Context
 
-- **Движок**: Unity 6+ (URP / HDRP)
-- **Язык**: C# (явные типы, `_camelCase` приватные поля, `UPPER_SNAKE_CASE` константы)
-- **Управление редактором**: Official Unity CLI (`unity`)
-- **Асинхронность**: `UniTask` (`UniTask<T>`, `UniTaskVoid`) с обязательным суффиксом `Async`
-- **Ввод**: New Input System (`UnityEngine.InputSystem`)
-
----
-
-## Структура репозитория (Zero Junk Policy)
-
-Весь код и пользовательские ресурсы проекта живут строго в `Assets/_Project/`:
-- `Assets/_Project/Develop/Runtime/` — C# скрипты игры, разбитые по фичам
-- `Assets/_Project/Develop/Editor/` — Editor-only тулы и скрипты
-- `Assets/_Project/Scenes/` — Сцены (`_Core/`, `Gameplay/`, `Sandboxes/`)
-- `Assets/_Project/Prefabs/` — Префабы сущностей, окружения, UI
-- `Assets/_Project/Art/` — Материалы (`M_*`), шейдеры, модели, текстуры
+- **Engine**: Unity 6+ (URP / HDRP)
+- **Language**: C# (explicit types, `_camelCase` private fields, `UPPER_SNAKE_CASE` constants)
+- **Editor Control**: Official Unity CLI (`unity`)
+- **Async**: `UniTask` (`UniTask<T>`, `UniTaskVoid`) with mandatory `Async` suffix
+- **Input**: New Input System (`UnityEngine.InputSystem`)
 
 ---
 
-## Навигация по правилам (`.agents/rules/`)
+## Repository Structure (Zero Junk Policy)
 
-Перед выполнением задач обращайся к профильным правилам:
-1. **Процесс и гейт фич** ➔ читай `.agents/rules/readiness-and-delivery.md` (Feature Gate $\ge 90\%$, автономность, интервью, DoD)
-2. **Ошибки и оверинжиниринг** ➔ читай `.agents/rules/anti-deadlock.md` (первопричина вместо костылей, Ponytail)
-3. **Git и ветки** ➔ читай `.agents/rules/git-workflow.md` (сохранность `.meta`, Conventional Commits на английском)
-4. **C# код** ➔ читай `.agents/rules/code-style.md`
-5. **Архитектура и связи** ➔ читай `.agents/rules/architecture-design.md` (Factory vs Spawner, Single State Owner, ISP)
-6. **Логика Unity и память** ➔ читай `.agents/rules/unity-best-practices.md` (неизменяемость SO, контракт сброса пула)
-7. **Интерфейс (UI)** ➔ читай `.agents/rules/ui-toolkit-pipeline.md` (HTML мокап в браузере, Layout-контракт 95%)
-8. **Управление сценами и сборкой** ➔ читай `.agents/rules/unity-cli.md` (никакого ручного редактирования YAML сцен!)
-9. **Структура файлов и ассетов** ➔ читай `.agents/rules/project-structure.md`
+All custom game assets and code live strictly inside `Assets/_Project/`:
+- `Assets/_Project/Develop/Runtime/` — Runtime C# scripts organized by feature
+- `Assets/_Project/Develop/Editor/` — Editor-only tools and property drawers
+- `Assets/_Project/Scenes/` — Scene files (`_Core/`, `Gameplay/`, `Sandboxes/`)
+- `Assets/_Project/Prefabs/` — Entity, environment, and UI prefabs
+- `Assets/_Project/Art/` — Materials (`M_*`), shaders, models, textures
 
 ---
 
-## Рабочий цикл агента
+## Rule Routing (`.agents/rules/`)
 
-1. **Перед кодингом**: собери вводные и сформируй карточку Feature Readiness ($\ge 90\%$ уверенности).
-2. **Во время работы со сценой**: проверяй `unity status`. Если редактор активен — управляй через `unity command`.
-3. **После написания C# кода**:
-   - Вызови `unity recompile --project-path .`
-   - Проверь ошибки: `unity command console --level error --tail 20`
-4. **Коммиты**: атомарные, осмысленные, на английском языке по стандарту Conventional Commits (`feat:`, `fix:`, `refactor:`, `chore:`).
+Consult specialized rule modules before acting on tasks:
+1. **Workflow & Feature Gate** ➔ read `.agents/rules/readiness-and-delivery.md` (Feature Gate $\ge 90\%$, autonomy, interview protocol, DoD)
+2. **Errors & Over-engineering** ➔ read `.agents/rules/anti-deadlock.md` (root causes over crutches, Ponytail ladder)
+3. **Git & Branches** ➔ read `.agents/rules/git-workflow.md` (`.meta` pairing, English Conventional Commits)
+4. **C# Code Standards** ➔ read `.agents/rules/code-style.md`
+5. **Architecture & Decoupling** ➔ read `.agents/rules/architecture-design.md` (Factory vs Spawner, Single State Owner, ISP)
+6. **Unity Engine & Memory** ➔ read `.agents/rules/unity-best-practices.md` (SO immutability, pool reset contract)
+7. **User Interface (UI)** ➔ read `.agents/rules/ui-toolkit-pipeline.md` (HTML browser prototype, 95% layout fidelity)
+8. **Scene & Build Management** ➔ read `.agents/rules/unity-cli.md` (no raw text editing of `.unity`/`.prefab` YAML!)
+9. **File Hierarchy & Assets** ➔ read `.agents/rules/project-structure.md`
+
+---
+
+## Agent Workflow Loop
+
+1. **Before Coding**: gather requirements and construct a Feature Readiness card ($\ge 90\%$ confidence).
+2. **Scene Manipulation**: inspect `unity status`. If editor is running, drive it via `unity command`.
+3. **After C# Modifications**:
+   - Run `unity recompile --project-path .`
+   - Inspect console: `unity command console --level error --tail 20`
+4. **Commits**: atomic, descriptive, English Conventional Commits (`feat:`, `fix:`, `refactor:`, `chore:`).

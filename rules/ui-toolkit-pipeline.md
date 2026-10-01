@@ -2,60 +2,60 @@
 paths: ["Assets/**/*.uxml", "Assets/**/*.uss", "Assets/**/*UI*.cs"]
 ---
 
-# Пайплайн интерфейса: UI Toolkit
+# UI Interface Pipeline: UI Toolkit
 
-> Регламент создания игрового интерфейса (UI Toolkit) в Unity 6+.  
-> Исключает переделывание визуальной части и гарантирует строгое соответствие согласованному дизайну.
-
----
-
-## 1. Двухэтапный пайплайн согласования (Two-Gate Pipeline)
-
-Создание интерфейса вслепую сразу в Unity приводит к десяткам итераций перекомпиляции и ручного выравнивания. Работа строится строго в 2 этапа:
-
-1. **Gate 1: Интерактивный HTML/CSS прототип в браузере**:
-   - Макет экрана собирается на чистом HTML/CSS/JS в отдельном локальном `.html` файле.
-   - Показываются реальные пропорции, цвета, шрифты, иконки и ключевые состояния кнопок (hover, active, disabled).
-   - Пользователь утверждает внешний вид, компоновку и визуальный стиль.
-   - До утверждения HTML макета перенос в Unity запрещен.
-2. **Gate 2: Перенос в Unity UI Toolkit**:
-   - Перенос структуры в `UXML`.
-   - Перенос стилей в `USS`.
-   - Подключение логики и команд в C#.
+> Standards for building game UI with UI Toolkit in Unity 6+.  
+> Eliminates visual rework and ensures fidelity to approved designs.
 
 ---
 
-## 2. Контракт вёрстки (Layout contract 95%)
+## 1. Two-Gate Pipeline
 
-- Утвержденный мокап или HTML прототип является строгим контрактом:
-  - Расположение, размеры, пропорции и выравнивание элементов воспроизводятся минимум на **95%**.
-- Запрещено добавлять подписи, подсказки, украшательства, дополнительные плашки или кнопки, которых не было на согласованном макете.
-- Если агент считает, что интерфейсу нужна дополнительная деталь — сначала согласуй её с пользователем.
+Building interfaces blindly directly in Unity produces dozens of unnecessary recompilation cycles and tedious manual tweaking. UI workflow follows 2 strict stages:
 
----
-
-## 3. Архитектурное разделение UI Toolkit
-
-1. **UXML (Структура)**:
-   - Содержит только дерево визуальных элементов (`VisualElement`, `Button`, `Label`).
-   - Оформление выносится в USS, инлайн-стили не используются.
-2. **USS (Стили и токены)**:
-   - Семантические цвета, отступы (`margin`, `padding`), шрифты, скругления.
-   - Псевдоклассы состояний: `:hover`, `:active`, `:disabled`.
-   - CSS-переходы (`transition: scale 0.1s ease-out`).
-3. **C# View / Controller (Логика и команды)**:
-   - Подписка на события кликов, обновление текстов и прогресс-баров.
-   - Изоляция от внутренней модели данных.
+1. **Gate 1: Interactive HTML/CSS prototype in browser**:
+   - Screen mockup is implemented in vanilla HTML/CSS/JS in a standalone local `.html` file.
+   - Demonstrates true aspect ratios, palette, typography, icons, and button interactive states (`:hover`, `:active`, `:disabled`).
+   - Human inspects and approves appearance, layout composition, and visual tone.
+   - Transferring assets to Unity prior to HTML prototype approval is prohibited.
+2. **Gate 2: Transfer to Unity UI Toolkit**:
+   - Transfer DOM hierarchy into `UXML`.
+   - Transfer CSS rules into `USS`.
+   - Bind commands, event listeners, and data flow in C#.
 
 ---
 
-## 4. Жизненный цикл Retained-Mode в Unity
+## 2. Layout Fidelity Contract (95% Fidelity)
 
-1. **Инициализация в `OnEnable`**:
-   - Поиск элементов через `rootVisualElement.Q<Button>("my-button")`.
-   - Регистрация кликов: `button.clicked += OnButtonClicked`.
-2. **Очистка в `OnDisable`**:
-   - Обязательная отписка: `button.clicked -= OnButtonClicked`.
-3. **Запрет построения и поллинга в `Update()`**:
-   - UI Toolkit — это Retained-mode система. Запрещено перестраивать дерево элементов или опрашивать данные в `Update()`.
-   - Интерфейс обновляется строго по событиям модели (например, при вызове `OnHealthChanged(int current)`).
+- Approved mockups and HTML prototypes serve as binding contracts:
+  - Placement, dimensions, scaling, proportions, and element alignment must reproduce the prototype with at least **95% fidelity**.
+- Adding unrequested tooltips, decorative badges, extra labels, or controls not present in the approved design is prohibited.
+- If the agent believes an extra UI element is needed, obtain approval prior to implementation.
+
+---
+
+## 3. UI Toolkit Architectural Separation
+
+1. **UXML (Structure)**:
+   - Contains strictly the visual element hierarchy (`VisualElement`, `Button`, `Label`).
+   - Visual styling lives in USS; inline styles are prohibited.
+2. **USS (Styles & Design Tokens)**:
+   - Semantic color palettes, margins, padding, typography, border-radii.
+   - Interactive pseudo-classes: `:hover`, `:active`, `:disabled`.
+   - Transitions (`transition: scale 0.1s ease-out`).
+3. **C# View / Controller (Logic & Commands)**:
+   - Event listening on clicks, updating label text, updating progress fill bars.
+   - Decoupled from internal domain models.
+
+---
+
+## 4. Retained-Mode Lifecycle in Unity
+
+1. **Initialization in `OnEnable`**:
+   - Query elements via `rootVisualElement.Q<Button>("my-button")`.
+   - Wire event handlers: `button.clicked += OnButtonClicked`.
+2. **Cleanup in `OnDisable`**:
+   - Mandatory unsubscription: `button.clicked -= OnButtonClicked`.
+3. **Prohibition of polling and rebuilding in `Update()`**:
+   - UI Toolkit is a retained-mode framework. Rebuilding element hierarchies or polling state in `Update()` is prohibited.
+   - The UI updates strictly in response to domain events (e.g., when `OnHealthChanged(int current)` fires).

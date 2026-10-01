@@ -1,65 +1,65 @@
-# START.md — Протокол первичной адаптации агента под проект
+# START.md — Project Self-Adaptation Protocol for Autonomous Agents
 
-> Этот файл читается автономным ИИ-агентом (DeepSeek Harness, Claude Code, Cursor) при первом подключении правил `true-unity-agent` к новому или существующему Unity-проекту.  
-> **Задача агента**: самостоятельно проанализировать проект, выявить реальный технологический стек, структуру папок и обновить файл контекста (`AGENTS.md` / `CLAUDE.md`).
-
----
-
-## Инструкция для агента: порядок действий
-
-Выполняй шаги строго последовательно:
-
-### Шаг 1. Сбор фактов о проекте (Reconnaissance)
-Не спрашивай у человека то, что можно прочитать из файлов. Сделай поиск по кодовой базе:
-
-1. **Версия движка**:
-   - Прочитай файл `ProjectSettings/ProjectVersion.txt` (например, `m_EditorVersion: 6000.3.25f1`).
-2. **Пакеты и зависимости**:
-   - Прочитай `Packages/manifest.json`.
-   - Определи:
-     * *Рендер*: URP (`com.unity.render-pipelines.universal`), HDRP или Built-in.
-     * *Ввод*: New Input System (`com.unity.inputsystem`) или Legacy Input.
-     * *Асинхронность*: UniTask (`com.cysharp.unitask`) или стандартный `Task`.
-     * *Архитектура и DI*: Morpeh ECS, Entitas, Zenject, VContainer или стандартный MonoBehaviour.
-     * *Интерфейс*: UI Toolkit (`com.unity.ui`), TextMeshPro или uGUI.
-     * *Навигация и физика*: `com.unity.ai.navigation`, Unity Physics.
-3. **Структура папок и сборки `asmdef`**:
-   - Проверь содержимое `Assets/`: используется ли стандарт `Assets/_Project/` или историческая структура.
-   - Найди все файлы `.asmdef` через `glob` (определи границы сборок `Runtime` и `Editor`).
-4. **Сцены и точки входа**:
-   - Найди сцены в проекте (`glob pattern: "**/*.unity"`).
-   - Определи стартовую сцену (`Boot`, `Init`, `GameEntryPoint`, `SampleScene`).
-5. **Git статус**:
-   - Проверь `git status` — убедись, что рабочее дерево чистое и не затронуты несохранённые файлы разработчика.
+> This file is read by autonomous AI agents (DeepSeek Harness, Claude Code, Cursor) when bootstrapping `true-unity-agent` rules in a new or existing Unity project.  
+> **Agent Objective**: Autonomously inspect the project, identify its active technology stack and directory layout, and adapt project context files (`AGENTS.md` / `CLAUDE.md`).
 
 ---
 
-### Шаг 2. Запись контекста проекта (`AGENTS.md` и `CLAUDE.md`)
+## Agent Instructions: Sequential Execution
 
-На основе собранных фактов открой **`AGENTS.md`** (и **`CLAUDE.md`**, если он используется) и заполни:
+Follow these steps strictly in sequence:
 
-1. **Шапка проекта**:
-   - Название игры/проекта (из `README.md` или имени корневой папки).
-   - Подтвержденный стек (версия Unity, рендер, асинхронность, ввод, DI/ECS).
-2. **Реальная структура каталогов**:
-   - Замени шаблонное дерево на фактическую структуру папок этого проекта.
-3. **Специфические правила стека**:
-   - Если в проекте используется специфический фреймворк (например, VContainer, Morpeh или FishNet) — добавь соответствующий пункт в таблицу маршрутизации правил `.agents/rules/`.
+### Step 1. Project Reconnaissance
+Do not ask the user for information already present in codebase files. Inspect the repository autonomously:
+
+1. **Engine Version**:
+   - Read `ProjectSettings/ProjectVersion.txt` (e.g., `m_EditorVersion: 6000.3.25f1`).
+2. **Packages & Dependencies**:
+   - Read `Packages/manifest.json`.
+   - Identify:
+     * *Render Pipeline*: URP (`com.unity.render-pipelines.universal`), HDRP, or Built-in.
+     * *Input*: New Input System (`com.unity.inputsystem`) or Legacy Input.
+     * *Async*: UniTask (`com.cysharp.unitask`) or standard `Task`.
+     * *Architecture & DI*: Morpeh ECS, Entitas, Zenject, VContainer, or pure MonoBehaviour.
+     * *UI*: UI Toolkit (`com.unity.ui`), TextMeshPro, or uGUI.
+     * *Navigation & Physics*: `com.unity.ai.navigation`, Unity Physics.
+3. **Directory Structure & `asmdef` Assemblies**:
+   - Inspect `Assets/`: check if `Assets/_Project/` or a custom convention is used.
+   - Locate all `.asmdef` files via `glob` (identify `Runtime` and `Editor` assembly boundaries).
+4. **Scenes & Entry Points**:
+   - Discover scene files (`glob pattern: "**/*.unity"`).
+   - Identify bootstrap scene (`Boot`, `Init`, `GameEntryPoint`, `SampleScene`).
+5. **Git Status**:
+   - Run `git status` — ensure working tree is clean and uncommitted human changes are protected.
 
 ---
 
-### Шаг 3. Проверка компиляции и статуса редактора
+## Step 2. Record Project Context (`AGENTS.md` & `CLAUDE.md`)
 
-1. Выполни `unity status --format json` (проверь, подключен ли редактор).
-2. Выполни `unity recompile --project-path .` (убедись, что проект компилируется без ошибок).
-3. Проверь консоль редактора на критические ошибки: `unity command console --level error --tail 20`.
+Based on discovered facts, open **`AGENTS.md`** (and **`CLAUDE.md`**, if present) and populate:
+
+1. **Project Header**:
+   - Game/Project name (from `README.md` or root directory name).
+   - Confirmed tech stack (Unity version, Render Pipeline, Async, Input, DI/ECS).
+2. **Actual Directory Structure**:
+   - Replace template folder tree with actual layout of this project.
+3. **Stack-Specific Rules**:
+   - If specialized frameworks are detected (e.g., VContainer, Morpeh, FishNet), append appropriate entries to the `.agents/rules/` routing table.
 
 ---
 
-### Шаг 4. Краткий отчет разработчику
+## Step 3. Compilation & Editor Verification
 
-После завершения адаптации сформируй лаконичный отчет (без воды):
-- **Обнаруженный стек**: Unity версия, Render Pipeline, Input, архитектура.
-- **Обновленные файлы**: какие файлы контекста были адаптированы под проект.
-- **Статус компиляции**: результат сборки проекта.
-- **Следующий шаг**: готовность к выполнению задач из бэклога.
+1. Run `unity status --format json` (verify if editor instance is active).
+2. Run `unity recompile --project-path .` (confirm clean compilation).
+3. Inspect editor console for critical errors: `unity command console --level error --tail 20`.
+
+---
+
+## Step 4. Concise Report to Developer
+
+Upon completing setup, output a brief report:
+- **Detected Stack**: Unity version, Render Pipeline, Input, Architecture.
+- **Updated Files**: Context files adapted to this project.
+- **Compilation Status**: Clean build confirmation.
+- **Next Step**: Readiness to execute backlog tasks.

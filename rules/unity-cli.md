@@ -2,99 +2,99 @@
 paths: ["**/*"]
 ---
 
-# Управление редактором через Unity CLI
+# Editor Control via Unity CLI
 
-> Стандарт взаимодействия с движком Unity 6+ через официальный CLI.  
-> Исключает повреждение файлов `.unity`, `.prefab`, `.asset` и гарантирует чистоту сборки.
-
----
-
-## 1. Безопасность ассетов и сцен
-
-Запрещено редактировать YAML-файлы сцен (`.unity`), префабов (`.prefab`) и ассетов (`.asset`) напрямую как текст при запущенном редакторе Unity. Прямая запись текста в эти файлы приводит к рассинхрону кэша редактора, потере GUID/FileID и повреждению ссылок.
-
-Любые манипуляции со сценой, создание объектов, добавление компонентов, запекание NavMesh и сохранение выполняются:
-1. Через **Unity CLI** (`unity command ...`) при активном редакторе.
-2. Либо через C# скрипты в папке `Editor/` (`[MenuItem]` или `InitializeOnLoad`).
+> Interaction standards for Unity 6+ using the official CLI.  
+> Prevents corruption of `.unity`, `.prefab`, and `.asset` files while ensuring clean builds.
 
 ---
 
-## 2. Проверка статуса редактора (Pre-flight)
+## 1. Asset & Scene Safety
 
-Перед выполнением любых действий, связанных с запуском тестов, созданием сцен или компиляцией:
+Direct text editing of scene (`.unity`), prefab (`.prefab`), and asset (`.asset`) YAML files while the Unity Editor is running is strictly prohibited. Modifying these files as raw text desynchronizes editor memory caches, corrupts GUIDs/FileIDs, and destroys serialized references.
+
+All scene operations, object instantiation, component modifications, NavMesh baking, and scene saves must be performed via:
+1. **Unity CLI** (`unity command ...`) when the editor instance is active.
+2. C# scripts located in the `Editor/` folder (`[MenuItem]` or `InitializeOnLoad`).
+
+---
+
+## 2. Editor Status Pre-flight
+
+Before executing tests, generating scenes, or compiling scripts:
 
 ```powershell
 unity status --format json
 ```
 
-- Если редактор запущен и состояние `ready`: используй интерактивные команды `unity command`.
-- Если редактор не запущен: пакетные команды (`unity recompile`, `unity test`) запустят headless-инстанс Unity в фоне.
+- If the editor is active and reports `ready`: use interactive `unity command` calls.
+- If the editor is not running: batch commands (`unity recompile`, `unity test`) launch a headless Unity background instance automatically.
 
 ---
 
-## 3. Живое управление сценой (`unity command`)
+## 3. Live Scene Manipulation (`unity command`)
 
-При подключенном редакторе используй быстрые команды для сборки уровня и настройки объектов:
+When connected to an active editor, use CLI commands for scene assembly and object setup:
 
-### Создание и поиск объектов:
+### Object Instantiation & Query:
 ```powershell
-# Создать пустой GameObject
+# Create empty GameObject
 unity command create_gameobject --name "PlayerRig"
 
-# Создать примитив (Cube, Sphere, Capsule, Cylinder, Plane)
+# Create primitive (Cube, Sphere, Capsule, Cylinder, Plane)
 unity command create_primitive --type Cube --name "Ground_Blockout"
 
-# Найти объект в иерархии
+# Find object in scene hierarchy
 unity command find_gameobject --name "PlayerRig"
 ```
 
-### Добавление и настройка компонентов:
+### Component Binding & Setup:
 ```powershell
-# Добавить компонент
+# Add component
 unity command add_component --target "PlayerRig" --component "CharacterController"
 
-# Вызвать запекание NavMesh
+# Trigger NavMesh bake
 unity command bake_navmesh
 
-# Сохранить открытую сцену
+# Save active scene
 unity command save_scene
 ```
 
-### Чтение логов консоли в реальном времени:
+### Live Console Inspection:
 ```powershell
-# Последние 20 ошибок в консоли редактора
+# Last 20 error logs from editor console
 unity command console --level error --tail 20
 
-# Все предупреждения и ошибки
+# All warnings and errors
 unity command console --level warning --tail 30
 ```
 
 ---
 
-## 4. Цикл компиляции и проверки
+## 4. Compilation & Verification Loop
 
-После изменения любого `.cs` файла агент выполняет проверку:
+After modifying any `.cs` file, execute the verification loop:
 
-1. **Запустить перекомпиляцию**:
+1. **Trigger recompile**:
    ```powershell
    unity recompile --project-path .
    ```
-2. **Проверить ошибки**:
-   - Если recompile завершился с ошибкой или есть CS-номера (`CS0246`, `CS1002`) — устранить причину.
-   - Проверить консоль редактора: `unity command console --level error --tail 10`.
-3. **Запустить тесты (если применимо)**:
+2. **Inspect errors**:
+   - If recompile returns non-zero or reports compiler diagnostic codes (`CS0246`, `CS1002`), fix root cause.
+   - Inspect editor console: `unity command console --level error --tail 10`.
+3. **Execute tests (when applicable)**:
    ```powershell
    unity test . --mode EditMode --report-format junit
    ```
 
 ---
 
-## 5. Восстановление при ошибках сборки
+## 5. Recovery on Build Failures
 
-Если редактор Unity вошел в Safe Mode или проект не компилируется:
-1. Запросить консоль: `unity command console --level error`.
-2. Устранить ошибки в C# коде.
-3. Если редактор перестал отвечать:
-   - Проверить `Get-Process Unity`.
-   - Не убивать процесс сразу, сначала попробовать `unity recompile`.
-   - Если перекомпиляция разблокировала редактор — продолжить работу.
+If the Unity Editor enters Safe Mode or compilation halts:
+1. Query console: `unity command console --level error`.
+2. Fix syntax and type issues in C# source files.
+3. If the editor becomes unresponsive:
+   - Check `Get-Process Unity`.
+   - Do not force-kill immediately; run `unity recompile`.
+   - Once compilation clears the lock, resume workflow.

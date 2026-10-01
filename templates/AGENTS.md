@@ -1,32 +1,32 @@
 # AGENTS.md — Master Agent Instructions (Unity Template)
 
-> Инструкции для автономных ИИ-агентов в проекте на Unity 6+.  
-> Все правила модульно разнесены по каталогу `.agents/rules/`.
+> Instructions for autonomous AI agents in Unity 6+ projects.  
+> All rules are modularized across the `.agents/rules/` directory.
 
 ---
 
-## Маршрутизация по правилам (`.agents/rules/`)
+## Rule Routing (`.agents/rules/`)
 
-### 1. Процесс и безопасность (Workflow)
-- **Согласование и приёмка фичи** ➔ [`.agents/rules/readiness-and-delivery.md`](./.agents/rules/readiness-and-delivery.md): разделение ролей (человек/агент), Feature Readiness Gate ($\ge 90\%$), протокол интервью, автономная доставка, Cross-Agent Handoff, Definition of Done.
-- **Ошибки и оверинжиниринг** ➔ [`.agents/rules/anti-deadlock.md`](./.agents/rules/anti-deadlock.md): лестница простоты Ponytail (YAGNI, stdlib, минимум сущностей), протокол поиска первопричины вместо костылей, правило 3 попыток.
-- **Git и ветки** ➔ [`.agents/rules/git-workflow.md`](./.agents/rules/git-workflow.md): стратегия веток (`feature/*`, `fix/*`, `backup/*`), неразрывность `.meta` файлов, Conventional Commits на английском.
+### 1. Workflow & Safety
+- **Feature Alignment & Delivery** ➔ [`.agents/rules/readiness-and-delivery.md`](./.agents/rules/readiness-and-delivery.md): role boundaries (human/agent), Feature Readiness Gate ($\ge 90\%$), interview protocol, autonomous delivery, Cross-Agent Handoff, Definition of Done.
+- **Errors & Over-engineering** ➔ [`.agents/rules/anti-deadlock.md`](./.agents/rules/anti-deadlock.md): Ponytail simplicity ladder (YAGNI, stdlib, minimal entities), root-cause bug fixing over crutches, 3-attempts rule.
+- **Git & Branches** ➔ [`.agents/rules/git-workflow.md`](./.agents/rules/git-workflow.md): branching strategy (`feature/*`, `fix/*`, `backup/*`), paired `.meta` file safety, English Conventional Commits.
 
-### 2. Код и архитектура (Engineering)
-- **Стиль C#** ➔ [`.agents/rules/code-style.md`](./.agents/rules/code-style.md): именование от сущности к свойству (`playerHealth`), явные типы вместо `var`, чистые геттеры, `ArgumentException` vs `InvalidOperationException`, UniTask.
-- **Архитектура и владение** ➔ [`.agents/rules/architecture-design.md`](./.agents/rules/architecture-design.md): разделение Factory и Spawner, Single State Owner, доменные модели вместо анемичных структур, узкие интерфейсы (ISP), Composition Root.
-- **Специфика Unity** ➔ [`.agents/rules/unity-best-practices.md`](./.agents/rules/unity-best-practices.md): неизменяемость ScriptableObject в рантайме, запрет тихих `return`, контракт сброса пула (физика/твины), изоляция Animator, `TryGetComponent`, `sqrMagnitude`.
+### 2. Engineering & Architecture
+- **C# Code Style** ➔ [`.agents/rules/code-style.md`](./.agents/rules/code-style.md): naming from entity to property (`playerHealth`), explicit types over `var`, pure getters, `ArgumentException` vs `InvalidOperationException`, UniTask standards.
+- **Architecture & Ownership** ➔ [`.agents/rules/architecture-design.md`](./.agents/rules/architecture-design.md): Factory vs Spawner separation, Single State Owner, rich domain models over anemic data bags, narrow interfaces (ISP), Composition Root.
+- **Unity Best Practices** ➔ [`.agents/rules/unity-best-practices.md`](./.agents/rules/unity-best-practices.md): runtime immutability of ScriptableObjects, prohibition of silent returns, object pool reset contract, Animator view decoupling, `TryGetComponent`, `sqrMagnitude`.
 
-### 3. Инструменты и ассеты (Tools & Assets)
-- **Интерфейс (UI Toolkit)** ➔ [`.agents/rules/ui-toolkit-pipeline.md`](./.agents/rules/ui-toolkit-pipeline.md): двухэтапный пайплайн (HTML/CSS макет в браузере ➔ аппрув ➔ перенос в Unity), Layout-контракт 95%, UXML + USS + retained-mode.
-- **Управление редактором** ➔ [`.agents/rules/unity-cli.md`](./.agents/rules/unity-cli.md): запрет редактирования файлов `.unity`/`.prefab` как текст при запущенном редакторе. Команды `unity command`, цикл `unity recompile`, чтение логов.
-- **Структура файлов** ➔ [`.agents/rules/project-structure.md`](./.agents/rules/project-structure.md): Zero Junk Policy — все пользовательские файлы строго внутри `Assets/_Project/`, именование ассетов, изоляция сборок через `asmdef`.
+### 3. Tools & Assets
+- **UI Toolkit Pipeline** ➔ [`.agents/rules/ui-toolkit-pipeline.md`](./.agents/rules/ui-toolkit-pipeline.md): two-gate pipeline (HTML/CSS browser prototype ➔ approval ➔ Unity UI Toolkit), 95% layout fidelity contract, UXML + USS + retained-mode.
+- **Editor Control** ➔ [`.agents/rules/unity-cli.md`](./.agents/rules/unity-cli.md): prohibition of direct text editing of `.unity`/`.prefab` YAML while editor is running. `unity command` driving, `unity recompile` loop, live log inspection.
+- **File Hierarchy** ➔ [`.agents/rules/project-structure.md`](./.agents/rules/project-structure.md): Zero Junk Policy (`Assets/_Project/`), asset naming standards, assembly boundaries via `asmdef`.
 
 ---
 
-## Защита от оверинжиниринга (принцип Ponytail)
+## Anti-Overengineering (Ponytail Principles)
 
-1. **YAGNI**: не пиши код на гипотетическое будущее.
-2. **Используй готовое**: Unity API и C# stdlib уже содержат решение.
-3. **Один класс с одной задачей** лучше, чем пять уровней фабрик и интерфейсов.
-4. **Код ➔ Перекомпиляция ➔ Проверка**: ни строчки непроверенного кода.
+1. **YAGNI**: Do not write code for speculative future needs.
+2. **Use Native Solutions**: Unity native APIs and the C# standard library already contain the solution.
+3. **One class with a single task** beats five layers of factories and interfaces.
+4. **Code ➔ Recompile ➔ Verify**: Zero unverified code commits.

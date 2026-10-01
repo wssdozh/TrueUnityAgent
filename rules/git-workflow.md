@@ -2,56 +2,56 @@
 paths: [".git/**", "**/*"]
 ---
 
-# Правила работы с Git в Unity
+# Git Workflow Standards in Unity
 
-> Стандарты работы с ветками, коммитами и файлами метаданных в Unity-проектах.  
-> Исключают потерю данных, конфликты слияния и рассинхрон GUID.
-
----
-
-## 1. Структура веток (Branching Strategy)
-
-- **`main`** — стабильная ветка проекта. Код обязан компилироваться и проходить тесты.
-- **`feature/<name>`** — разработка новой фичи или механики (`feature/player-dash`).
-- **`fix/<name>`** — исправление конкретного бага (`fix/navmesh-obstacle-carve`).
-- **`chore/<name>`** — обновление пакетов, тулинг, настройки проекта (`chore/update-packages`).
-- **`backup/<name>`** — страховочные ветки перед крупными миграциями версий или очисткой LFS.
+> Branching standards, commit conventions, and metadata integrity in Unity repositories.  
+> Eliminates data loss, merge conflicts, and GUID desynchronization.
 
 ---
 
-## 2. Специфика Unity в Git
+## 1. Branching Strategy
 
-1. **Неразрывность ассета и `.meta` файла**:
-   * Любой файл или папка в `Assets/` имеет парный файл `.meta` с уникальным GUID.
-   * Запрещено коммитить `.cs`, `.prefab` или `.asset` без соответствующего `.meta` файла (и наоборот).
-   * Удаление или переименование файла обязано сопровождаться удалением или переименованием его `.meta`.
-2. **Исключение временных файлов**:
-   * В `.gitignore` исключаются: `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `MemoryCaptures/`, `Recordings/`, `Build/`, `.vs/`, `.idea/`.
-3. **Git LFS для бинарных ассетов**:
-   * Текстуры (`.png`, `.tga`, `.psd`), 3D-модели (`.fbx`, `.obj`), аудио (`.wav`, `.mp3`) и видео (`.mp4`) отслеживаются через Git LFS (`git lfs track "*.fbx"`).
-4. **Запрет `push --force` в `main`**.
+- **`main`** — stable project branch. Code must compile cleanly and pass tests.
+- **`feature/<name>`** — active feature or mechanic implementation (`feature/player-dash`).
+- **`fix/<name>`** — bug fix targeting an exact issue (`fix/navmesh-obstacle-carve`).
+- **`chore/<name>`** — package updates, tooling, project settings (`chore/update-packages`).
+- **`backup/<name>`** — safety snapshots prior to major engine upgrades or LFS reorganization.
 
 ---
 
-## 3. Стандарт сообщений коммитов (Conventional Commits)
+## 2. Unity-Specific Git Invariants
 
-Все сообщения коммитов пишутся на английском языке, кратко и в повелительном наклонении:
+1. **Asset and `.meta` pairing**:
+   * Every file and directory inside `Assets/` has an associated `.meta` file carrying a unique GUID.
+   * Committing `.cs`, `.prefab`, or `.asset` files without their matching `.meta` files (or vice versa) is strictly prohibited.
+   * Moving or deleting files must always include moving or deleting their corresponding `.meta` files.
+2. **Exclusion of transient directories**:
+   * `.gitignore` must ignore: `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `MemoryCaptures/`, `Recordings/`, `Build/`, `.vs/`, `.idea/`.
+3. **Git LFS for binary assets**:
+   * Textures (`.png`, `.tga`, `.psd`), 3D models (`.fbx`, `.obj`), audio (`.wav`, `.mp3`), and video (`.mp4`) are tracked via Git LFS (`git lfs track "*.fbx"`).
+4. **Prohibition of `push --force` to `main`**.
+
+---
+
+## 3. Commit Message Standard (Conventional Commits)
+
+All commit messages are written in English, concise, and in the imperative mood:
 
 `type(scope): imperative description`
 
-### Типы:
-- **`feat`**: новая механика, компонент или система (`feat(combat): implement toothpick thrust spherecast`)
-- **`fix`**: исправление бага или ошибки компиляции (`fix(camera): correct trauma shake decay formula`)
-- **`refactor`**: изменение структуры кода без изменения игрового поведения (`refactor(enemy): decouple steering from brain`)
-- **`perf`**: оптимизация памяти, пулинга или вызовов (`perf(pool): preallocate shatter shard rigidbodies`)
-- **`chore`**: правка конфигов, пакетов `manifest.json`, метаданных или правил агента (`chore(agents): add git workflow rule`)
-- **`docs`**: обновление README, GDD или документации архитектуры (`docs(gdd): add arena dimension specs`)
+### Types:
+- **`feat`**: new mechanic, component, or system (`feat(combat): implement toothpick thrust spherecast`)
+- **`fix`**: bug fix or compilation error fix (`fix(camera): correct trauma shake decay formula`)
+- **`refactor`**: structural change without behavioral alterations (`refactor(enemy): decouple steering from brain`)
+- **`perf`**: memory, pooling, or runtime performance optimization (`perf(pool): preallocate shatter shard rigidbodies`)
+- **`chore`**: config updates, `manifest.json` packages, metadata, or agent rules (`chore(agents): add git workflow rule`)
+- **`docs`**: README, GDD, or architecture documentation updates (`docs(gdd): add arena dimension specs`)
 
 ---
 
-## 4. Чек-лист перед слиянием (Pre-Merge Checklist)
+## 4. Pre-Merge Checklist
 
-Перед слиянием feature-ветки или пушем в `main`:
-1. `unity recompile --project-path .` — компиляция завершилась без ошибок.
-2. `git status` — нет потерянных или не отслеживаемых `.meta` файлов.
-3. `unity command console --level error` — в консоли редактора нет критических ошибок и исключений.
+Prior to merging a feature branch or pushing to `main`:
+1. `unity recompile --project-path .` — compilation succeeds with zero errors.
+2. `git status` — no orphaned or untracked `.meta` files.
+3. `unity command console --level error` — zero critical errors or exceptions in editor console.

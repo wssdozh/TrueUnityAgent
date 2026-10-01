@@ -2,108 +2,108 @@
 paths: ["**/*"]
 ---
 
-# Согласование фич, интервью и автономная работа
+# Feature Alignment, Interview Protocol & Autonomous Execution
 
-> Правила разделения ответственности, снятия неопределенностей (Pre-flight), автономного цикла и передачи контекста.
-
----
-
-## 1. Разделение ответственности
-
-### Владелец проекта (Человек):
-- Геймдизайн, правила игры, баланс и экономика.
-- Приоритеты фич и границы скоупа.
-- Утверждение ключевых архитектурных решений.
-- Субъективная оценка геймфила на плейтесте.
-
-### Агент:
-- Превращение согласованного брифа в работающий и проверенный код.
-- Текущие инженерные решения в рамках выбранной архитектуры.
-- Сохранение структуры файлов проекта и пользовательских правок.
-- Честный отчет о тестах, проверках компиляции и оставшихся рисках.
-
-**Запрет на отсебятину**: Агенту запрещено молча выдумывать игровые правила, балансные цифры, названия предметов, UI-тексты или менять схему управления. Если деталь не указана — согласуй её перед тем, как писать код.
+> Rules for role ownership, resolving uncertainties (Pre-flight), autonomous execution cycles, and cross-agent handoff.
 
 ---
 
-## 2. Гейт готовности фичи (Feature Readiness Gate)
+## 1. Role Boundaries
 
-Перед началом реализации нетривиальной механики, системы или рефакторинга агент обязан собрать контекст и зафиксировать карточку готовности:
+### Project Owner (Human):
+- Game design, gameplay rules, game balance, and economy.
+- Feature priorities and scope boundaries.
+- Approval of foundational architectural choices.
+- Subjective evaluation of game feel during playtests.
+
+### Agent:
+- Turning the approved brief into robust, verified code.
+- Day-to-day engineering decisions within the selected architecture.
+- Preserving project directory structure and user-authored code.
+- Transparent reporting on test results, compilation checks, and lingering risks.
+
+**No unauthorized design liberties**: The agent is strictly prohibited from silently inventing gameplay rules, balance values, item names, UI copy, or altering control schemes. If a detail is missing, clarify it before writing code.
+
+---
+
+## 2. Feature Readiness Gate
+
+Before implementing any non-trivial mechanic, system, or refactoring, the agent must assemble context and produce a readiness card:
 
 ```text
 Feature Readiness:
-- goal: <что конкретно получает игрок/система>
-- behavior and boundaries: <что меняется, а что остаётся нетронутым>
-- integrations/data: <какие скрипты, конфиги и контракты затрагиваются>
-- acceptance: <наблюдаемые условия успешной приёмки>
-- delegated assumptions: <список допущений, переданных на усмотрение агента>
+- goal: <what the player or system concretely receives>
+- behavior and boundaries: <what changes and what remains untouched>
+- integrations/data: <affected scripts, configs, and contracts>
+- acceptance: <observable criteria for successful verification>
+- delegated assumptions: <assumptions delegated to agent discretion>
 - confidence: <0-100%>
 ```
 
-### Правила проверки (Pre-flight):
-1. **Запрещено начинать кодинг при уверенности ниже 90%**:
-   - Если поведение, состояния, ввод или контракты данных не ясны — сначала задай вопросы человеку.
-2. **Факты из кода ищи сам**:
-   - Не спрашивай у пользователя то, что есть в проекте: версии пакетов (`manifest.json`), существующие компоненты или сцены ищи через `grep` и чтение файлов.
+### Pre-flight Verification Rules:
+1. **Coding is prohibited below 90% confidence**:
+   - If behavior, state flows, input bindings, or data contracts remain ambiguous, ask the human first.
+2. **Discover codebase facts autonomously**:
+   - Do not ask the user for information already present in the repository: inspect package versions (`manifest.json`), existing components, or scenes using `grep` and file reading tools.
 
 ---
 
-## 3. Протокол интервью (Снятие неопределенностей)
+## 3. Interview Protocol (Clarifying Ambiguities)
 
-Когда требуется уточнение требований или выбор архитектурного пути:
+When clarifying requirements or choosing an architectural direction:
 
-1. **Базовый чек-лист вводных**:
-   - *Целевая платформа*: Desktop / Mobile (лимиты draw calls, VRAM, многокамерность в URP).
-   - *Масштаб в рантайме*: сколько объектов обрабатывается одновременно (10 или 5000), с какой частотой.
-   - *Пакеты в стеке*: UniTask или Coroutines, New Input System, ECS или MonoBehaviour, сетевой стек.
-   - *Прежние попытки*: если фича переделывается — что пробовали раньше и почему не подошло.
-   - *Жёсткие ограничения*: что нельзя ломать (публичный API, структура сохранений, префабы).
-2. **Один вопрос за раз**:
-   - Решай одну развилку архитектурного дерева за один шаг. Не смешивай 5 разнородных вопросов в одну простыню.
-3. **Структурированный выбор (`ask_user_question`)**:
-   - Предлагай 2–4 конкретных варианта решения с техническими трейдоффами.
-   - Рекомендуемый вариант ставь первым с пометкой `(Рекомендуется)`.
-   - Пользователь всегда имеет возможность ввести свой вариант (`custom`).
-4. **Адаптация дерева решений**:
-   - Следующий вопрос зависит от выбранного ответа. Не задавай вопросы по ветке, которая уже отпала.
-5. **Без лишних преамбул**: 1–2 строки сути проблемы и конкретные варианты.
-
----
-
-## 4. Автономная доставка (Autonomous Delivery)
-
-Как только Feature Readiness Gate пройден ($\ge 90\%$ уверенности):
-
-1. **Двигаться автономно до полного завершения**:
-   - Не останавливаться после каждого созданного файла с вопросом «продолжать ли?».
-   - Писать код ➔ запускать `unity recompile` ➔ устранять ошибки компилятора ➔ проверять консоль на исключения ➔ фиксировать коммитами.
-2. **Останавливаться только при реальных блокерах**:
-   - Обнаружен неразрешимый продуктовый конфликт в логике.
-   - Требуется установка нового тяжелого стороннего пакета.
-   - Возник риск потери пользовательских данных или невосстановимого повреждения сцены.
+1. **Baseline context checklist**:
+   - *Target platform*: Desktop vs Mobile (draw call ceilings, VRAM budgets, multiple cameras in URP).
+   - *Runtime scale*: object count processed concurrently (10 vs 5,000) and update frequency.
+   - *Active package stack*: UniTask vs Coroutines, New Input System, ECS vs MonoBehaviour, networking stack.
+   - *Prior attempts*: for rewrites, what was attempted previously and why did it fail.
+   - *Hard constraints*: systems that must not break (public API, save file schemas, shared prefabs).
+2. **One question at a time**:
+   - Resolve one branch of the decision tree per step. Never dump a 5-question wall of text.
+3. **Structured choices (`ask_user_question`)**:
+   - Offer 2–4 concrete technical options detailing engineering trade-offs.
+   - Place the recommended option first, marked with `(Recommended)`.
+   - Always allow custom human input (`custom`).
+4. **Adaptive branching**:
+   - The subsequent question must depend on the previous selection. Never ask questions along discarded branches.
+5. **No unnecessary preamble**: 1–2 lines describing the dilemma followed immediately by concrete options.
 
 ---
 
-## 5. Передача контекста (Cross-Agent Handoff)
+## 4. Autonomous Delivery
 
-При завершении задачи или передаче следующей сессии формируется лаконичный блок:
+Once the Feature Readiness Gate is passed ($\ge 90\%$ confidence):
+
+1. **Execute autonomously to full completion**:
+   - Do not stop after each file asking "shall I continue?".
+   - Write code ➔ run `unity recompile` ➔ fix compiler errors ➔ inspect console for runtime exceptions ➔ commit results.
+2. **Halt only on genuine blockers**:
+   - Unresolvable product conflict in game logic.
+   - Requirement to install heavy external packages.
+   - Risk of user data loss or unrecoverable scene corruption.
+
+---
+
+## 5. Cross-Agent Handoff
+
+When completing a task or transferring context across sessions, format a concise handoff block:
 
 ```markdown
 ### Cross-Agent Handoff
-- **Задача / Симптом**: <что требовалось сделать или какой баг устранить>
-- **Первопричина (Root Cause)**: <почему возникал баг или почему выбрано такое решение>
-- **Изменения**: <затронутые системы, C# файлы, компоненты префабов>
-- **Проверка**: <результаты unity recompile, тестов и чистки консоли>
-- **Что осталось вне скоупа**: <следующие шаги или оставшийся бэклог>
+- **Task / Symptom**: <what was requested or which bug was reported>
+- **Root Cause**: <why the bug occurred or why this solution was selected>
+- **Changes**: <affected systems, C# files, prefab components>
+- **Verification**: <results of unity recompile, tests, and console inspection>
+- **Remaining / Out of Scope**: <next steps or remaining backlog items>
 ```
 
 ---
 
-## 6. Критерии готовности (Definition of Done)
+## 6. Definition of Done (DoD)
 
-Задача считается выполненной, когда:
-1. Поведение в игре соответствует согласованному брифу.
-2. Сборка проходит без ошибок: `unity recompile --project-path .`.
-3. В консоли редактора нет новых ошибок и исключений (`unity command console --level error`).
-4. Все созданные файлы лежат внутри `Assets/_Project/`.
-5. Изменения зафиксированы атомарными коммитами по стандарту Conventional Commits на английском языке.
+A task is considered complete only when:
+1. In-game behavior matches the approved brief.
+2. Compilation succeeds with zero errors: `unity recompile --project-path .`.
+3. Editor console reports zero new errors or exceptions (`unity command console --level error`).
+4. All newly created files reside strictly inside `Assets/_Project/`.
+5. Changes are committed via atomic English Conventional Commits.

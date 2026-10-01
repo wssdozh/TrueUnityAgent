@@ -2,121 +2,121 @@
 paths: ["**/*.cs", "**/*.unity", "**/*.prefab"]
 ---
 
-# Ошибки и ограничения Unity: память, ссылки и сериализация
+# Unity Gotchas & Constraints: Memory, References & Serialization
 
-> Специфика работы с компонентами, жизненным циклом и памятью Unity.
+> Engine-specific rules for components, lifecycles, and memory management in Unity.
 
 ---
 
-## 1. Сериализация и зависимости компонентов
+## 1. Serialization & Component Dependencies
 
-1. **Запрет типа `GameObject` в сериализации**:
-   - `[SerializeField] private CharacterView _prefab;` вместо `[SerializeField] private GameObject _prefab;`.
-   - Поле обязано быть строго типизировано целевым компонентом или `Transform`. Это исключает подсовывание невалидных префабов и убирает лишние `GetComponent` при спавне.
-2. **Безальтернативный `TryGetComponent`**:
-   - Не использовать слепой `GetComponent` на сторонних объектах. `TryGetComponent` не аллоцирует память в куче и сразу проверяет наличие:
+1. **Prohibition of `GameObject` serialization**:
+   - `[SerializeField] private CharacterView _prefab;` instead of `[SerializeField] private GameObject _prefab;`.
+   - Fields must be strictly typed to the target component or `Transform`. This guarantees invalid prefabs cannot be assigned and eliminates redundant `GetComponent` calls on spawn.
+2. **Mandatory `TryGetComponent`**:
+   - Never use blind `GetComponent` on external objects. `TryGetComponent` causes zero heap allocations and immediately verifies existence:
    ```csharp
    if (collider.TryGetComponent(out IDamageable target))
    {
        target.TakeDamage(_damage);
    }
    ```
-3. **Запрет тихих `return` при отсутствии обязательных зависимостей**:
-   - Не писать `if (_rigidbody == null) return;` внутри `Update()` / `FixedUpdate()` — это маскирует ошибки настройки префабов на сцене.
-   - Валидировать ссылки в `Awake()` с явным выбросом исключения или логом ошибки:
+3. **Prohibition of silent returns on missing dependencies**:
+   - Never write `if (_rigidbody == null) return;` inside `Update()` / `FixedUpdate()` — this masks prefab setup errors.
+   - Validate references in `Awake()` with explicit exceptions:
    ```csharp
    private void Awake()
    {
        if (TryGetComponent(out _rigidbody) == false)
        {
-           throw new MissingComponentException($"[PhysicsMover] Rigidbody не найден на объекте {gameObject.name}");
+           throw new MissingComponentException($"[PhysicsMover] Rigidbody not found on {gameObject.name}");
        }
    }
    ```
-4. **Разграничение жизненного цикла: `Awake` против `Start` / `Initialize`**:
-   - В `MonoBehaviour` запрещены C#-конструкторы (объекты создает движок через native-код).
-   - В `Awake()`: только локальная самонастройка (собственные поля, `TryGetComponent` на самом себе). Запрещено обращаться к чужим компонентам на сцене — порядок вызова `Awake` между разными GameObjects недетерминирован.
-   - В `Start()` или явном методе `Initialize(...)` / `Construct(...)`: межкомпонентные связи, регистрация и запуск систем.
+4. **Lifecycle boundary: `Awake` vs `Start` / `Initialize`**:
+   - C# constructors are prohibited on `MonoBehaviour` classes (instances are constructed natively by the engine).
+   - In `Awake()`: strictly local self-setup (local fields, `TryGetComponent` on self). Accessing external scene components in `Awake` is prohibited because cross-object execution order is non-deterministic.
+   - In `Start()` or an explicit `Initialize(...)` / `Construct(...)` method: wire external cross-component dependencies and launch systems.
 
 ---
 
-## 2. Неизменяемость ScriptableObject в рантайме
+## 2. Runtime Immutability of ScriptableObjects
 
-1. **`ScriptableObject` — это неизменяемое определение данных (Data Definition)**:
-   - Поля ScriptableObject настраиваются в инспекторе.
-   - **Запрещено менять поля ScriptableObject в коде рантайма**:
-     - В редакторе Unity изменение значения сохраняется на диск в `.asset` файл и затирает исходные данные.
-     - В билде мутация SO не сбрасывается между перезапусками сцен и ломает состояние игры.
-2. **Динамическое состояние живёт в экземпляре сущности**:
-   - Конфиг задает базовые статы (`MaxHealth`, `BaseSpeed`).
-   - Текущие значения (`CurrentHealth`, `CurrentSpeed`) хранятся в MonoBehaviour-компоненте, C#-модели или ECS-компоненте.
-
----
-
-## 3. Изоляция Animator и декомпозиция сущности
-
-1. **`Animator` — только пассивный визуализатор**:
-   - Компонент `Animator` никогда не должен знать про логику ввода, стейт игры или статы персонажа.
-   - Контроллер сущности передает параметры в аниматор (`_animator.SetFloat(SpeedHash, speed)`). Аниматор не вызывает бизнес-методы сущности напрямую.
-2. **Кэширование идентификаторов Animator и Shader**:
-   - Запрещено передавать строковые литералы в методы анимаций и материалов: `_animator.Play("Run")`, `_animator.SetFloat("Speed", 1f)`, `_material.SetFloat("_Cutoff", 0.5f)`. Движок хеширует строки на каждом вызове.
-   - Использовать целочисленные хеши в `static readonly int` полях: `private static readonly int SpeedHash = Animator.StringToHash("Speed");` и `Shader.PropertyToID("_Cutoff")`. Запрещены строковые корутины `StartCoroutine("MoveRoutine")`.
-3. **Декомпозиция движения и поведения (SRP)**:
-   - Не объединять в одном скрипте перемещение, вращение, навигацию, здоровье и спавн.
-   - `Mover` двигает, `Rotator` поворачивает, `NavAgent` строит путь, `Health` считает урон, `View` отображает визуальные эффекты.
+1. **`ScriptableObject` is an immutable Data Definition**:
+   - Fields are configured in the inspector.
+   - **Modifying ScriptableObject fields at runtime is strictly prohibited**:
+     - In the Unity Editor, runtime mutations persist to disk in `.asset` files and overwrite source values.
+     - In standalone builds, mutations persist across scene reloads and corrupt game state.
+2. **Dynamic state belongs in entity instances**:
+   - Configs specify base stats (`MaxHealth`, `BaseSpeed`).
+   - Active dynamic values (`CurrentHealth`, `CurrentSpeed`) live in MonoBehaviour components, C# models, or ECS components.
 
 ---
 
-## 4. Память, GC и контракт пулинга (Object Pooling)
+## 3. Animator Decoupling & Entity Decomposition
 
-1. **Контракт сброса состояния при пулинге (Pool Reset Contract)**:
-   - При возврате объекта в пул и перед выдачей из пула объект обязан очистить свое состояние:
-     * Сбросить физику: `rigidbody.linearVelocity = Vector3.zero; rigidbody.angularVelocity = Vector3.zero;`
-     * Остановить активные корутины и твины.
-     * Сбросить здоровье, кулдауны и визуальные эффекты.
-2. **Никаких аллокаций в свойствах и геттерах**:
-   - Запрещено вызывать `.ToArray()`, `.ToList()`, `new List<T>()` внутри свойств или методов, вызываемых каждый кадр.
-   - Для чтения коллекций отдавать `IReadOnlyList<T>` по ссылке на существующий внутренний список.
-3. **Кэширование `WaitForSeconds`**:
-   - Не создавать `new WaitForSeconds(...)` в каждой итерации цикла. Кэшировать объект заранее либо использовать `UniTask.Delay(TimeSpan, cancellationToken: ct)`.
-4. **Zero-LINQ и Zero GC Alloc в горячих путях (`Update` / `FixedUpdate`)**:
-   - Запрещен LINQ (`Where`, `Select`, `OrderBy`, `FirstOrDefault`) внутри тиков и методов, вызываемых чаще одного раза в секунду. Замыкания и итераторы аллоцируют объекты в куче и вызывают GC-фризы. Использовать классические `for` циклы по индексам.
-   - Запрещена строковая конкатенация и интерполяция в `Update` (`_text.text = $"Score: {_score}"` обновлять только по событию изменения счета).
-5. **Безальтернативный `NonAlloc` в физических запросах**:
-   - Запрещено использовать аллоцирующие запросы: `Physics.OverlapSphere`, `Physics.RaycastAll`.
-   - Использовать `Physics.OverlapSphereNonAlloc` и `Physics.RaycastNonAlloc` с заранее выделенным буферным массивом `Collider[]` / `RaycastHit[]`.
+1. **`Animator` is purely a passive view**:
+   - The `Animator` component must never contain game logic, state management, or character stats.
+   - The entity controller passes parameters into the animator (`_animator.SetFloat(SpeedHash, speed)`). The animator never calls domain business logic directly.
+2. **Cache Animator and Shader IDs**:
+   - Passing string literals to animation and material methods is prohibited: `_animator.Play("Run")`, `_animator.SetFloat("Speed", 1f)`, `_material.SetFloat("_Cutoff", 0.5f)`. The engine hashes strings on every invocation.
+   - Use integer hashes cached in `static readonly int` fields: `private static readonly int SpeedHash = Animator.StringToHash("Speed");` and `Shader.PropertyToID("_Cutoff")`. String-based coroutines `StartCoroutine("MoveRoutine")` are prohibited.
+3. **Single Responsibility in movement & behavior (SRP)**:
+   - Do not combine movement, rotation, pathfinding, health, and spawning in a single script.
+   - `Mover` translates, `Rotator` rotates, `NavAgent` steers, `Health` tracks damage, `View` renders visual effects.
 
 ---
 
-## 5. Физика и математика
+## 4. Memory, GC & Object Pooling Contracts
 
-1. **Дистанции строго через `sqrMagnitude`**:
-   - `Vector3.Distance` извлекает квадратный корень — это тяжелая операция. Сравнивай квадраты:
+1. **Object Pool Reset Contract**:
+   - On release to pool and prior to re-acquisition, the object must reset its state completely:
+     * Reset physics: `rigidbody.linearVelocity = Vector3.zero; rigidbody.angularVelocity = Vector3.zero;`
+     * Cancel running coroutines and active tweens.
+     * Reset health, cooldown timers, and visual particle systems.
+2. **Zero allocations in properties and getters**:
+   - Calling `.ToArray()`, `.ToList()`, `new List<T>()` inside properties or per-frame methods is prohibited.
+   - Expose `IReadOnlyList<T>` referencing an existing internal list.
+3. **Cache `WaitForSeconds`**:
+   - Do not instantiate `new WaitForSeconds(...)` every loop iteration. Cache the instance or use `UniTask.Delay(TimeSpan, cancellationToken: ct)`.
+4. **Zero LINQ & Zero GC Alloc in hot paths (`Update` / `FixedUpdate`)**:
+   - LINQ (`Where`, `Select`, `OrderBy`, `FirstOrDefault`) is prohibited inside frame updates or methods called frequently. Closures and iterators allocate garbage on the heap, triggering GC spikes. Use classic index-based `for` loops.
+   - String concatenation and interpolation inside `Update` are prohibited (`_text.text = $"Score: {_score}"` updates only on score-change events).
+5. **Mandatory `NonAlloc` physics queries**:
+   - Allocating queries are prohibited: `Physics.OverlapSphere`, `Physics.RaycastAll`.
+   - Use `Physics.OverlapSphereNonAlloc` and `Physics.RaycastNonAlloc` with preallocated buffer arrays (`Collider[]`, `RaycastHit[]`).
+
+---
+
+## 5. Physics & Mathematics
+
+1. **Distances strictly via `sqrMagnitude`**:
+   - `Vector3.Distance` computes a square root. Compare squared magnitudes:
    ```csharp
    float sqrDistance = (targetPos - transform.position).sqrMagnitude;
    if (sqrDistance <= _attackRange * _attackRange) { ... }
    ```
-2. **Безопасное сравнение чисел с плавающей точкой (`float`)**:
-   - Запрещено прямое равенство: `if (currentHealth == 0f)` или `if (timer == maxTime)`.
-   - Использовать `Mathf.Approximately(a, b)` либо `Mathf.Abs(a - b) < Mathf.Epsilon`.
-3. **Физика только в `FixedUpdate`**:
-   - Модификация `velocity`, вызовы `AddForce` и физические рейкасты логики выполняются строго в `FixedUpdate`.
-4. **Координаты в `transform.Translate` (защита от двойного поворота)**:
-   - `transform.Translate(vector)` по умолчанию считает вектор в **локальных** координатах объекта.
-   - Запрещено: `transform.Translate(transform.forward * speed * Time.deltaTime)` — `transform.forward` уже является мировым вектором; при передаче в локальный `Translate` поворот применяется дважды, вызывая неконтролируемый занос.
-   - Разрешено: либо локально `transform.Translate(Vector3.forward * speed * Time.deltaTime);`, либо глобально `transform.position += transform.forward * speed * Time.deltaTime;` (или с параметром `Space.World`).
+2. **Safe floating-point comparisons (`float`)**:
+   - Direct equality is prohibited: `if (currentHealth == 0f)` or `if (timer == maxTime)`.
+   - Use `Mathf.Approximately(a, b)` or `Mathf.Abs(a - b) < Mathf.Epsilon`.
+3. **Physics strictly in `FixedUpdate`**:
+   - Velocity updates, `AddForce` calls, and gameplay physics casts execute strictly in `FixedUpdate`.
+4. **Coordinates in `transform.Translate` (Double-Rotation Guard)**:
+   - `transform.Translate(vector)` assumes the vector is in **local** object space by default.
+   - Prohibited: `transform.Translate(transform.forward * speed * Time.deltaTime)` — `transform.forward` is already a world-space vector; passing it into local `Translate` applies object rotation twice, causing erratic drifting.
+   - Allowed: either locally `transform.Translate(Vector3.forward * speed * Time.deltaTime);`, or globally `transform.position += transform.forward * speed * Time.deltaTime;` (or passing `Space.World`).
 
 ---
 
-## 6. События и отписки
+## 6. Events & Subscriptions
 
-1. **Стандартный C# `Action` вместо `UnityAction` / `UnityEvent` в коде**:
-   - `Action<T>` работает быстрее и не создает накладных расходов сериализации Unity.
-2. **Обязательная отписка**:
-   - Любая подписка на событие другого объекта обязана иметь отписку в `OnDisable` или `OnDestroy`.
-3. **Отложенное удаление (`Destroy` Latency)**:
-   - `Destroy(gameObject)` уничтожает объект только в конце кадра. До конца кадра `obj != null` истинно, а объект остается в списках и реестрах сцены.
-   - При вызове `Destroy` немедленно удалять сущность из всех внутренних списков, словарей и пространственных структур в той же строке кода.
-4. **Статическое состояние и Fast Play Mode**:
-   - При отключенной перезагрузке домена (Enter Play Mode Options -> Reload Domain disabled) статические события и переменные не сбрасываются между запусками игры в редакторе, сохраняя ссылки на уничтоженные объекты.
-   - Статические события запрещены. При необходимости статических полей сбрасывать их через `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`.
+1. **Standard C# `Action` over `UnityAction` / `UnityEvent` in code**:
+   - `Action<T>` executes faster and avoids Unity serialization overhead.
+2. **Mandatory unsubscription**:
+   - Every event subscription to an external object must have a matching unsubscription in `OnDisable` or `OnDestroy`.
+3. **Deferred Destruction (`Destroy` Latency)**:
+   - `Destroy(gameObject)` frees objects at the end of the frame. Until frame end, `obj != null` remains true, and the object stays in scene collections.
+   - When calling `Destroy`, immediately remove the entity from internal tracking lists, dictionaries, and spatial structures on the same line.
+4. **Static state & Fast Play Mode**:
+   - When Enter Play Mode Options has Reload Domain disabled, static events and fields retain values between Play Mode sessions, holding dead references to destroyed objects.
+   - Static events are prohibited. If static state is strictly required, reset it using `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`.
