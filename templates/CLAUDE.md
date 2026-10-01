@@ -34,6 +34,7 @@
 4. **Создаешь новые файлы или структуру?** ➔ читай `.agents/rules/project-structure.md`
 5. **Планируешь механику?** ➔ запускай интервью по `.agents/rules/grill-me.md`
 6. **Застрял на ошибке?** ➔ следуй протоколу `.agents/rules/anti-deadlock.md` (правило 3 попыток, Ponytail)
+7. **Делаешь коммиты или ветки?** ➔ читай `.agents/rules/git-workflow.md` (сохранность `.meta`, Conventional Commits на английском)
 
 ---
 

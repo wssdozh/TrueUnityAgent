@@ -15,6 +15,7 @@
 | **Файлы & Организация** | [`.agents/rules/project-structure.md`](./.agents/rules/project-structure.md) | Zero Junk Policy: всё в `Assets/_Project/`. Именование ассетов (`M_`, `T_`, `SH_`, `sfx_`), разделение через asmdef. |
 | **Планирование & Архитектура** | [`.agents/rules/grill-me.md`](./.agents/rules/grill-me.md) | Pre-flight интервью (платформа, стек, числа) перед написанием кода. Опрос через варианты решения. |
 | **Предотвращение тупиков** | [`.agents/rules/anti-deadlock.md`](./.agents/rules/anti-deadlock.md) | Лестница Ponytail (YAGNI, stdlib, минимум сущностей), лимит 3 попыток исправления ошибок. |
+| **Git & Безопасность** | [`.agents/rules/git-workflow.md`](./.agents/rules/git-workflow.md) | Ветки (`feature/*`, `fix/*`, `backup/*`), сохранность `.meta` файлов, Conventional Commits на английском. |
 
 ---
 
