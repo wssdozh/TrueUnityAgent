@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="true-unity-agent" width="760">
+  <img src="assets/banner.svg" alt="True Unity Agent" width="760">
 </p>
 
 <h1 align="center">True Unity Agent</h1>
@@ -18,107 +18,70 @@
 
 ---
 
-Просишь ИИ сделать простой кулдаун выстрела.  
-В ответ он заводит `ShotCooldownManager`, вешает `Update()` с тиками, интерфейс `IShotCooldownService`, шину событий и ScriptableObject.
+Кодекс архитектурных правил, инженерных стандартов и чек-листов для автономных ИИ-агентов (**DeepSeek Harness**, **Claude Code**, **Cursor**, **Windsurf**) в проектах на Unity 6+.
 
-**True Unity Agent** заставляет агента писать минимальный рабочий код без архитектурного раздутия и костылей.
-
----
-
-## Было / Стало
-
-### 1. Кулдаун выстрела
-Обычный агент городит корутину с аллокациями в куче:
-```csharp
-StartCoroutine(CooldownRoutine());
-IEnumerator CooldownRoutine() {
-    yield return new WaitForSeconds(0.5f); // аллокация GC на каждый вызов
-    _canShoot = true;
-}
-```
-С **True Unity Agent** — один float, ноль мусора в памяти:
-```csharp
-if (Time.time < _nextFireTime) return;
-_nextFireTime = Time.time + COOLDOWN;
-```
-
-### 2. Проверка дистанции
-Обычный агент считает корень в `Update` каждый кадр:
-```csharp
-if (Vector3.Distance(transform.position, target.position) <= attackRange)
-```
-С **True Unity Agent** — скалярное сравнение квадратов:
-```csharp
-if ((transform.position - target.position).sqrMagnitude <= attackRange * attackRange)
-```
-
-### 3. Компонент при коллизии
-Обычный агент делает слепой поиск и плодит `NullReferenceException`:
-```csharp
-var health = other.GetComponent<Health>();
-if (health != null) health.TakeDamage(10);
-```
-С **True Unity Agent** — без аллокаций и безопасно:
-```csharp
-if (other.TryGetComponent(out Health health)) health.TakeDamage(10);
-```
+Заставляет агента писать минимальный рабочий C# код, искать первопричины багов вместо расстановки костылей и безопасно управлять редактором через официальный Unity CLI без повреждения файлов сцен и префабов.
 
 ---
 
-## Быстрый старт за 10 секунд
+## Быстрый старт
 
-### 1. Установи правила в проект
-Выполни команду в PowerShell, указав путь к корню своего Unity-проекта:
+### 1. Подключи правила к проекту
+
+Запусти установщик в PowerShell, передав путь к корню своего Unity-проекта:
 
 ```powershell
 .\install.ps1 -TargetPath "C:\Путь\К\Твоему\UnityПроекту"
 ```
+
 *(Либо подключи как submodule: `git submodule add https://github.com/wssdozh/true-unity-agent.git .agents`)*
 
-### 2. Запусти адаптацию
-Открой чат с агентом (DSH / Claude Code / Cursor) в своем проекте и отправь одну строку:
+Скрипт создаст структуру `.agents/rules/` и положит точки входа: `START.md`, `AGENTS.md`, `CLAUDE.md`, `.cursorrules`.
+
+### 2. Запусти адаптацию контекста
+
+Открой чат с агентом в своем проекте и отправь одну команду:
 
 ```text
 Прочитай START.md и адаптируй контекст под этот проект.
 ```
 
-Агент сам прочитает `manifest.json`, определит стек (URP, Input System, UniTask, DI/ECS), разметит карту папок и запишет актуальный контекст в `AGENTS.md`.
+Агент сам прочитает `manifest.json` и `ProjectVersion.txt`, определит стек (URP, Input System, UniTask, DI/ECS), разметит границы папок `Assets/` и запишет готовый рабочий контекст в `AGENTS.md`.
 
 ---
 
-## Как это работает: Лестница Ponytail
+## Ключевые стандарты
 
-Перед тем как написать строчку кода, агент останавливается на самой нижней рабочей ступени:
+- **Поиск первопричины (Root-Cause Fix)**  
+  Запрещено маскировать баги слепыми проверками `if (x != null)` по десяти местам или пустыми блоками `try/catch`. Проблема исследуется по всему стеку вызовов и устраняется один раз в источнике данных.
 
-```text
-1. Этому вообще нужно существовать? → Нет: выкидываем (YAGNI)
-2. Уже есть в проекте?               → Переиспользуем, а не пишем заново
-3. Умеет стандартная библиотека?    → Берём Mathf, Span<T>, System.Collections
-4. Умеет сама Unity?                 → Берём Physics, NavMesh, URP, Input System
-5. Умеет установленный пакет?       → Берём UniTask, PrimeTween
-6. Можно решить в одну строку?       → Решаем в одну строку
-7. Только если ничего не подошло    → Пишем минимум необходимого кода
-```
+- **Лестница простоты Ponytail**  
+  Бритва Оккама против оверинжиниринга. Агент ищет решение строго снизу вверх: YAGNI ➔ готовые классы проекта ➔ C# stdlib (`Mathf`, `Span<T>`) ➔ Unity API ➔ установленный пакет ➔ одна строка ➔ и только потом новый код. Никаких пустых абстракций и интерфейсов с одной реализацией.
 
-- **Чинить первопричину, а не симптомы**: проверки `if (x != null)` по десяти местам и пустые `try/catch` запрещены. Проблема устраняется один раз в источнике данных.
-- **Объяснение длиннее кода? Сотри объяснение**: код говорит сам за себя.
-- **Пометка компромиссов (`// ponytail:`)**: при осознанном выборе простого алгоритма оставляется комментарий с порогом переделки (`// ponytail: переписать на Spatial Grid при N > 300`).
+- **Безопасность YAML и Unity CLI**  
+  Жесткий запрет прямого редактирования файлов сцен (`.unity`), префабов (`.prefab`) и ассетов как текст при запущенном редакторе. Управление сценой, добавление компонентов и запекание выполняются через `unity command`.
+
+- **Контракт вёрстки 95% (UI Toolkit)**  
+  Двухэтапный пайплайн интерфейса: сначала интерактивный HTML/CSS макет в браузере ➔ аппрув человеком ➔ перенос в UXML/USS. Запрещено выдумывать декоративные плашки, подсказки и кнопки, которых не было на согласованном макете.
+
+- **Zero Junk Policy**  
+  Все пользовательские скрипты, сцены и ассеты изолированы строго в `Assets/_Project/`. Именование ресурсов стандартизировано (`M_*`, `T_*`, `sfx_*`), компиляция изолирована через модульные `asmdef`.
 
 ---
 
 ## Модули правил (`rules/`)
 
-| Файл | Область | Что делает |
+| Модуль | Область | Описание |
 | :--- | :--- | :--- |
-| [`readiness-and-delivery.md`](./rules/readiness-and-delivery.md) | **Workflow** | Feature Gate ($\ge 90\%$), опрос `ask_user_question`, автономная доставка, DoD. |
-| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Workflow** | Лестница Ponytail, поиск первопричины (No Crutches), лимит 3 попыток. |
-| [`git-workflow.md`](./rules/git-workflow.md) | **Workflow** | Ветки (`feature/*`, `fix/*`), целостность `.meta`, Conventional Commits на английском. |
-| [`code-style.md`](./rules/code-style.md) | **Engineering** | Именование `playerHealth`, явные типы вместо `var`, чистые геттеры, UniTask. |
-| [`architecture-design.md`](./rules/architecture-design.md) | **Engineering** | Factory отдельно от Spawner, Single State Owner, доменные модели, ISP, Entry Point. |
-| [`unity-best-practices.md`](./rules/unity-best-practices.md) | **Engineering** | ScriptableObject неизменяем в рантайме, сброс пула, изоляция Animator, `sqrMagnitude`. |
-| [`ui-toolkit-pipeline.md`](./rules/ui-toolkit-pipeline.md) | **Tools** | Двухэтапный UI пайплайн (HTML в браузере ➔ Unity), контракт вёрстки 95%, retained-mode. |
-| [`unity-cli.md`](./rules/unity-cli.md) | **Tools** | Запрет правки YAML сцен/префабов как текст. Команды `unity command`, цикл `unity recompile`. |
-| [`project-structure.md`](./rules/project-structure.md) | **Tools** | Zero Junk Policy (`Assets/_Project/`), префиксы ассетов, изоляция через `asmdef`. |
+| [`readiness-and-delivery.md`](./rules/readiness-and-delivery.md) | **Workflow** | Feature Gate ($\ge 90\%$), протокол опроса разработчика, автономная доставка, DoD, Handoff. |
+| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Workflow** | Лестница Ponytail, поиск первопричины (No Crutches), правило 3 попыток против зацикливания. |
+| [`git-workflow.md`](./rules/git-workflow.md) | **Workflow** | Стратегия веток (`feature/*`, `fix/*`), целостность парных `.meta` файлов, Conventional Commits. |
+| [`code-style.md`](./rules/code-style.md) | **Engineering** | Именование `playerHealth`, явные типы вместо `var`, чистые геттеры, `ArgumentException` vs `InvalidOperationException`, UniTask. |
+| [`architecture-design.md`](./rules/architecture-design.md) | **Engineering** | Factory отдельно от Spawner, Single State Owner, доменные модели, узкие интерфейсы (ISP), Composition Root. |
+| [`unity-best-practices.md`](./rules/unity-best-practices.md) | **Engineering** | ScriptableObject неизменяем в рантайме, запрет тихих `return`, контракт сброса пула, изоляция Animator, `sqrMagnitude`. |
+| [`ui-toolkit-pipeline.md`](./rules/ui-toolkit-pipeline.md) | **Tools** | Двухэтапный UI пайплайн (HTML в браузере ➔ Unity), контракт вёрстки 95%, retained-mode C#. |
+| [`unity-cli.md`](./rules/unity-cli.md) | **Tools** | Запрет правки YAML файлов как текст. Команды `unity command`, цикл перекомпиляции `unity recompile`. |
+| [`project-structure.md`](./rules/project-structure.md) | **Tools** | Zero Junk Policy (`Assets/_Project/`), правила префиксов, изоляция сборок через `asmdef`. |
 
 ---
 
