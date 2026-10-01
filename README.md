@@ -55,6 +55,22 @@ git submodule add https://github.com/wssdozh/true-unity-agent.git .agents
 
 ---
 
+## Первый запуск агента в новом проекте
+
+После того как файлы скопированы в проект, отправьте агенту (DSH / Claude / Cursor) одну команду:
+
+```text
+Прочитай START.md и адаптируй контекст под этот проект.
+```
+
+Агент автономно:
+1. Определит версию Unity (`ProjectVersion.txt`) и установленный стек (`Packages/manifest.json`: URP, Input, UniTask, ECS/DI).
+2. Просканирует структуру папок `Assets/` и границы сборок `.asmdef`.
+3. Заполнит реальную карту каталогов и стек в `AGENTS.md` (и `CLAUDE.md`).
+4. Проверит компиляцию через `unity recompile`.
+
+---
+
 ## Лицензия
 
 MIT © [wssdozh](https://github.com/wssdozh)

@@ -65,8 +65,8 @@ if (Test-Path $sourceAgentsReadme) {
     Copy-Item -Path $sourceAgentsReadme -Destination (Join-Path $DestAgentsDir "README.md") -Force
 }
 
-# 4. Копируем точки входа: CLAUDE.md, AGENTS.md, .cursorrules
-$entryFiles = @("CLAUDE.md", "AGENTS.md", ".cursorrules")
+# 4. Копируем точки входа: START.md, CLAUDE.md, AGENTS.md, .cursorrules
+$entryFiles = @("START.md", "CLAUDE.md", "AGENTS.md", ".cursorrules")
 foreach ($file in $entryFiles) {
     $src = Join-Path $TemplatesDir $file
     $dest = Join-Path $TargetPath $file
