@@ -2,7 +2,7 @@
   <img src="assets/banner.svg" alt="true-unity-agent" width="760">
 </p>
 
-<h1 align="center">true-unity-agent</h1>
+<h1 align="center">True Unity Agent</h1>
 
 <p align="center">
   <em>Видит твой менеджер на 200 строк. Пишет три строки. Компилируется.</em>
@@ -21,7 +21,7 @@
 Просишь ИИ сделать простой кулдаун выстрела.  
 В ответ он заводит `ShotCooldownManager`, вешает `Update()` с тиками, интерфейс `IShotCooldownService`, шину событий и ScriptableObject.
 
-`true-unity-agent` заставляет агента писать минимальный рабочий код без архитектурного раздутия и костылей.
+**True Unity Agent** заставляет агента писать минимальный рабочий код без архитектурного раздутия и костылей.
 
 ---
 
@@ -36,7 +36,7 @@ IEnumerator CooldownRoutine() {
     _canShoot = true;
 }
 ```
-С `true-unity-agent` — один float, ноль мусора в памяти:
+С **True Unity Agent** — один float, ноль мусора в памяти:
 ```csharp
 if (Time.time < _nextFireTime) return;
 _nextFireTime = Time.time + COOLDOWN;
@@ -47,7 +47,7 @@ _nextFireTime = Time.time + COOLDOWN;
 ```csharp
 if (Vector3.Distance(transform.position, target.position) <= attackRange)
 ```
-С `true-unity-agent` — скалярное сравнение квадратов:
+С **True Unity Agent** — скалярное сравнение квадратов:
 ```csharp
 if ((transform.position - target.position).sqrMagnitude <= attackRange * attackRange)
 ```
@@ -58,7 +58,7 @@ if ((transform.position - target.position).sqrMagnitude <= attackRange * attackR
 var health = other.GetComponent<Health>();
 if (health != null) health.TakeDamage(10);
 ```
-С `true-unity-agent` — без аллокаций и безопасно:
+С **True Unity Agent** — без аллокаций и безопасно:
 ```csharp
 if (other.TryGetComponent(out Health health)) health.TakeDamage(10);
 ```

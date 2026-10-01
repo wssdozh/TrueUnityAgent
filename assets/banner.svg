@@ -43,8 +43,8 @@
   <!-- Typography -->
   <g transform="translate(160, 0)">
     <!-- Title -->
-    <text x="0" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#f4f4f5" letter-spacing="-0.5">
-      true-unity-agent
+    <text x="0" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="31" font-weight="700" fill="#f4f4f5" letter-spacing="-0.3">
+      True Unity Agent
     </text>
 
     <!-- Subtitle -->
