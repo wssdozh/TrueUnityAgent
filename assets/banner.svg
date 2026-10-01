@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 140" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b" />
+      <stop offset="100%" stop-color="#111115" />
+    </linearGradient>
+
+    <!-- Cube Gradients -->
+    <linearGradient id="cube-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="cube-left" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0369a1" />
+      <stop offset="100%" stop-color="#0c4a6e" />
+    </linearGradient>
+    <linearGradient id="cube-right" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#075985" />
+    </linearGradient>
+  </defs>
+
+  <!-- Canvas -->
+  <rect width="840" height="140" rx="12" fill="url(#bg-grad)" />
+  <rect width="838" height="138" x="1" y="1" rx="11" fill="none" stroke="#27272a" stroke-width="1" />
+
+  <!-- 3D Isometric Cube Glyph -->
+  <g transform="translate(90, 70) scale(0.72)">
+    <!-- Top Face -->
+    <polygon points="0,-46 42,-23 0,0 -42,-23" fill="url(#cube-top)" />
+    <!-- Left Face -->
+    <polygon points="-42,-23 0,0 0,48 -42,25" fill="url(#cube-left)" />
+    <!-- Right Face -->
+    <polygon points="0,0 42,-23 42,25 0,48" fill="url(#cube-right)" />
+
+    <!-- Sharp Inner Axis Lines -->
+    <line x1="0" y1="0" x2="0" y2="48" stroke="#38bdf8" stroke-width="2" opacity="0.8" />
+    <line x1="0" y1="0" x2="-42" y2="-23" stroke="#7dd3fc" stroke-width="1.5" opacity="0.6" />
+    <line x1="0" y1="0" x2="42" y2="-23" stroke="#7dd3fc" stroke-width="1.5" opacity="0.6" />
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(160, 0)">
+    <!-- Title -->
+    <text x="0" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#f4f4f5" letter-spacing="-0.5">
+      true-unity-agent
+    </text>
+
+    <!-- Subtitle -->
+    <text x="0" y="94" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="14" font-weight="400" fill="#a1a1aa">
+      Senior engineering standards &amp; anti-overengineering for Unity 6+
+    </text>
+  </g>
+</svg>
