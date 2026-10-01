@@ -1,79 +1,54 @@
-# ⚔️ true-unity-agent
+# true-unity-agent
 
-> **Бескомпромиссный золотой стандарт инструкций, архитектурных правил и чек-листов для автономных ИИ-агентов в Unity 6+.**  
-> Совместим с **Claude Code**, **DeepSeek Harness**, **Cursor IDE**, **Windsurf** и **GitHub Copilot**.
+Инструкции, правила кода и шаблоны для автономных агентов (Claude Code, DeepSeek Harness, Cursor, Windsurf) в проектах на Unity 6+.
 
-Создан разработчиком [@wssdozh](https://github.com/wssdozh) на основе сотен часов реальной практики, разбора критических антипаттернов и автоматизации Unity через CLI.
-
----
-
-## 💡 Зачем это нужно?
-
-Обычные LLM без жестких правил в Unity совершают одни и те же фатальные ошибки:
-- ❌ Напрямую перезаписывают текст `.unity` и `.prefab` файлов, ломая GUID сцены и заставляя Unity падать.
-- ❌ Пишут `GameObject` в сериализуемые поля, плодя слепые `GetComponent` по всей игре.
-- ❌ Создают бесконечные аллокации `new WaitForSeconds` в корутинах и считают расстояния через тяжёлый `Vector3.Distance`.
-- ❌ Загромождают корень `Assets/` мусорными скриптами и временными ассетами без структуры.
-- ❌ Зацикливаются на исправлении одной и той же ошибки компиляции, тратя токены и ломая проект.
-
-**`true-unity-agent` полностью решает эти проблемы через модульный кодекс правил.**
+Репозиторий решает частые проблемы, когда агент работает с Unity напрямую: ломает сцены и префабы ручной правкой YAML, плодит слепые `GetComponent`, забивает кучу аллокациями и зацикливается на ошибках компиляции.
 
 ---
 
-## 📂 Модульная система правил (`rules/`)
+## Что внутри (`rules/`)
 
-| Модуль | Описание стандарта |
+| Файл | Назначение |
 | :--- | :--- |
-| 📘 [`code-style.md`](./rules/code-style.md) | **True C#**: явные типы вместо `var`, порядок полей/методов, `_camelCase` приватные поля, `UPPER_SNAKE_CASE` константы, обязательный `UniTask` с суффиксом `Async`, запрет `Task` и `async void`, строгий синтаксис `if (x == false)`. |
-| ⚡ [`unity-best-practices.md`](./rules/unity-best-practices.md) | **True Unity**: запрет `GameObject` в сериализации, безальтернативный `TryGetComponent`, расчёт расстояний строго через `sqrMagnitude`, кэширование задержек, обязательный Object Pooling для снарядов/VFX. |
-| 🕹️ [`unity-cli.md`](./rules/unity-cli.md) | **True Unity CLI**: жесткий запрет ручной правки YAML сцен/префабов. Управление редактором через `unity command` (`create_gameobject`, `bake_navmesh`, `save_scene`), верификация через `unity recompile` и чтение `unity console`. |
-| 🗂️ [`project-structure.md`](./rules/project-structure.md) | **True File & Zero Junk Policy**: весь пользовательский контент изолирован строго в `Assets/_Project/`. Соглашения именования (`M_*`, `T_*`, `SH_*`, `sfx_*`), мгновенная компиляция через модульные Assembly Definitions (`asmdef`). |
-| 🎯 [`grill-me.md`](./rules/grill-me.md) | **Pre-flight Interview**: сбор вводных (платформа, стек, масштаб, ограничения) и пошаговый опрос пользователя перед планированием фич. |
-| 🛡️ [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Ponytail Ladder**: защита от архитектурного оверинжиниринга (YAGNI, использование стандартных библиотек C# и Unity, минимум абстракций) и «Правило 3 попыток» против бесконечных циклов ошибок. |
+| [`code-style.md`](./rules/code-style.md) | **C# код-стайл**: явные типы вместо `var`, приватные поля `_camelCase`, константы `UPPER_SNAKE_CASE`, асинхронность только на `UniTask` с суффиксом `Async` (без `Task` и `async void`), явная проверка `if (x == false)`. |
+| [`unity-best-practices.md`](./rules/unity-best-practices.md) | **Практики Unity**: запрет `GameObject` в сериализации (ссылаемся сразу на нужный компонент), `TryGetComponent` вместо `GetComponent`, проверка дистанций через `sqrMagnitude`, пулинг для спавна и кэш задержек. |
+| [`unity-cli.md`](./rules/unity-cli.md) | **Работа с редактором**: запрет править `.unity` и `.prefab` руками как текст. Сборка сцены и спавн через `unity command`, проверка через `unity recompile` и чтение ошибок из консоли редактора. |
+| [`project-structure.md`](./rules/project-structure.md) | **Структура файлов**: весь пользовательский код и ассеты живут строго в `Assets/_Project/`. Именование материалов (`M_*`), шейдеров (`SH_*`), звуков (`sfx_*`), изоляция сборок через `asmdef`. |
+| [`grill-me.md`](./rules/grill-me.md) | **Чек-лист перед кодом**: сбор вводных (платформа, стек, объемы в рантайме) и уточнение развилок у разработчика до написания классов. |
+| [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Защита от оверинжиниринга**: YAGNI, использование готового Unity API и C# stdlib вместо велосипедов, лимит 3 попыток исправления ошибок сборки. |
 
 ---
 
-## 🚀 Как подключить к любому новому Unity-проекту
+## Подключение к проекту
 
-### Способ 1: Быстрая установка скриптом (Рекомендуется)
+### Вариант 1. Через PowerShell-скрипт
 
-Запустите PowerShell-установщик, указав путь к вашему Unity-проекту:
+Запустить установщик из репозитория и передать путь к папке игры:
 
 ```powershell
-# Из этой папки:
-.\install.ps1 -TargetPath "C:\Users\morii\Projects\MyNewUnityGame"
-
-# Либо если вы находитесь в корне целевого проекта:
-& "C:\Users\morii\OneDrive\Dokumenter\prompts\true-unity-agent\install.ps1"
+.\install.ps1 -TargetPath "C:\Path\To\UnityProject"
 ```
 
-Скрипт автоматически:
-1. Создаст папку `.agents/rules/` в целевом проекте.
-2. Скопирует все модульные правила.
-3. Разместит готовые входные точки: `CLAUDE.md`, `AGENTS.md` и `.cursorrules`.
+Скрипт создаст папку `.agents/rules/`, скопирует туда правила и положит готовые файлы конфигурации (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`) в корень проекта.
 
----
+### Вариант 2. Через Git Submodule
 
-### Способ 2: Через Git Submodule
-
-Если ваш Unity-проект уже является git-репозиторием:
+Если проект уже под гитом:
 
 ```bash
 git submodule add https://github.com/wssdozh/true-unity-agent.git .agents
 ```
 
----
+### Вариант 3. Вручную
 
-### Способ 3: Вручную
-
-Скопируйте содержимое папки `templates/` в корень вашего Unity-проекта:
+Скопировать файлы из папки `templates/` в корень своего проекта:
 - `templates/.agents/` ➔ в `.agents/`
-- `templates/CLAUDE.md` ➔ в корень проекта
-- `templates/AGENTS.md` ➔ в корень проекта
-- `templates/.cursorrules` ➔ в корень проекта
+- `templates/CLAUDE.md` ➔ в корень
+- `templates/AGENTS.md` ➔ в корень
+- `templates/.cursorrules` ➔ в корень
 
 ---
 
-## 📜 Лицензия
+## Лицензия
 
 MIT © [wssdozh](https://github.com/wssdozh)

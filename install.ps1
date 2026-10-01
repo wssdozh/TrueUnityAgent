@@ -81,7 +81,4 @@ foreach ($file in $entryFiles) {
 }
 
 Write-Host ""
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host " Установка true-unity-agent завершена!" -ForegroundColor Yellow
-Write-Host " Теперь любой агент (Claude, Harness, Cursor) готов к работе в проекте!" -ForegroundColor Green
-Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "Готово. Правила и шаблоны true-unity-agent скопированы в $TargetPath" -ForegroundColor Green
