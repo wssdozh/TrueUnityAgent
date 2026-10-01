@@ -107,6 +107,17 @@ paths: ["**/*.cs"]
    - Верхняя граница в `System.Random.Next` эксклюзивна (не включается). Для значений 1..10 писать `random.Next(1, 11)`.
 7. **Ввод через цикл, а не рекурсию**:
    - Ожидание валидного ввода или состояния делается циклом (`while`), а не рекурсивным перезапуском метода (защита от `StackOverflowException`).
+8. **Запрет `?.` для типов `UnityEngine.Object` (Fake Null)**:
+   - В C# оператор `?.` проверяет только managed pointer в IL (`ldnull`) и полностью игнорирует перегруженный Unity `operator ==`. Если `GameObject` или `Component` уничтожен через `Destroy()`, нативный C++ объект удален, но C#-обертка жива. Проверка `target != null` вернет `false`, но `target?.DoSomething()` вызовется на мертвом объекте и выбросит `MissingReferenceException`.
+   - Запрещено: `_target?.TakeDamage();`, `_animator?.SetTrigger(hash);`.
+   - Разрешено: `if (_target != null) { _target.TakeDamage(); }`.
+9. **Запрет анонимных лямбд в подписках на события**:
+   - Запрещено подписываться анонимными лямбдами на события объектов с жизненным циклом (`_health.Damaged += dmg => OnDamaged(dmg);` или `_button.onClick.AddListener(() => OnClick());`).
+   - От анонимного делегата невозможно отписаться через `-=` в `OnDisable()` или `OnDestroy()`. Это приводит к утечке памяти и вызовам методов на уничтоженных объектах.
+   - Разрешено: подписка строго на именованный метод (`_health.Damaged += OnDamaged;`) с обязательной отпиской в `OnDisable` или `OnDestroy`.
+10. **Защита инкапсуляции коллекций**:
+    - Запрещено выставлять публичные изменяемые коллекции: `public List<Item> Items => _items;`. Внешний код может вызвать `Items.Clear()` или `Items.Add()` в обход владельца состояния.
+    - Разрешено: наружу отдаются только интерфейсы чтения: `public IReadOnlyList<Item> Items => _items;` или `public IReadOnlyDictionary<int, Item> Items => _items;`. Мутация списка — только через методы класса-владельца (`TryAdd`, `TryRemove`).
 
 ---
 
