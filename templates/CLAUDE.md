@@ -29,15 +29,15 @@
 ## Навигация по правилам (`.agents/rules/`)
 
 Перед выполнением задач обращайся к профильным правилам:
-1. **Регламент и гейт фич** ➔ читай `.agents/rules/readiness-and-delivery.md` (Feature Gate $\ge 90\%$, автономность, DoD)
-2. **Пишешь C# код?** ➔ читай `.agents/rules/code-style.md`
-3. **Архитектура и связи?** ➔ читай `.agents/rules/architecture-design.md` (Factory vs Spawner, Single State Owner, ISP)
-4. **Пишешь Unity-логику или физику?** ➔ читай `.agents/rules/unity-best-practices.md` (неизменяемость SO, контракт сброса пула)
-5. **Делаешь UI?** ➔ читай `.agents/rules/ui-toolkit-pipeline.md` (HTML мокап в браузере, Layout-контракт 95%)
-6. **Управляешь сценами или компиляцией?** ➔ читай `.agents/rules/unity-cli.md` (никакого ручного редактирования YAML сцен!)
-7. **Создаешь новые файлы или структуру?** ➔ читай `.agents/rules/project-structure.md`
-8. **Застрял на ошибке?** ➔ следуй протоколу `.agents/rules/anti-deadlock.md` (первопричина вместо костылей, Ponytail)
-9. **Делаешь коммиты или ветки?** ➔ читай `.agents/rules/git-workflow.md` (сохранность `.meta`, Conventional Commits на английском)
+1. **Процесс и гейт фич** ➔ читай `.agents/rules/readiness-and-delivery.md` (Feature Gate $\ge 90\%$, автономность, интервью, DoD)
+2. **Ошибки и оверинжиниринг** ➔ читай `.agents/rules/anti-deadlock.md` (первопричина вместо костылей, Ponytail)
+3. **Git и ветки** ➔ читай `.agents/rules/git-workflow.md` (сохранность `.meta`, Conventional Commits на английском)
+4. **C# код** ➔ читай `.agents/rules/code-style.md`
+5. **Архитектура и связи** ➔ читай `.agents/rules/architecture-design.md` (Factory vs Spawner, Single State Owner, ISP)
+6. **Логика Unity и память** ➔ читай `.agents/rules/unity-best-practices.md` (неизменяемость SO, контракт сброса пула)
+7. **Интерфейс (UI)** ➔ читай `.agents/rules/ui-toolkit-pipeline.md` (HTML мокап в браузере, Layout-контракт 95%)
+8. **Управление сценами и сборкой** ➔ читай `.agents/rules/unity-cli.md` (никакого ручного редактирования YAML сцен!)
+9. **Структура файлов и ассетов** ➔ читай `.agents/rules/project-structure.md`
 
 ---
 
