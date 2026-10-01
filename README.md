@@ -76,7 +76,7 @@
 | [`readiness-and-delivery.md`](./rules/readiness-and-delivery.md) | **Workflow** | Feature Gate ($\ge 90\%$), протокол опроса разработчика, автономная доставка, DoD, Handoff. |
 | [`anti-deadlock.md`](./rules/anti-deadlock.md) | **Workflow** | Лестница Ponytail, поиск первопричины (No Crutches), правило 3 попыток против зацикливания. |
 | [`git-workflow.md`](./rules/git-workflow.md) | **Workflow** | Стратегия веток (`feature/*`, `fix/*`), целостность парных `.meta` файлов, Conventional Commits. |
-| [`code-style.md`](./rules/code-style.md) | **Engineering** | Именование `playerHealth`, явные типы вместо `var`, чистые геттеры, `ArgumentException` vs `InvalidOperationException`, UniTask. |
+| [`code-style.md`](./rules/code-style.md) | **Engineering** | Именование `playerHealth`, явные типы вместо `var`, whitespace (пустые строки, скобки Allman), UniTask. |
 | [`architecture-design.md`](./rules/architecture-design.md) | **Engineering** | Factory отдельно от Spawner, Single State Owner, доменные модели, узкие интерфейсы (ISP), Composition Root. |
 | [`unity-best-practices.md`](./rules/unity-best-practices.md) | **Engineering** | ScriptableObject неизменяем в рантайме, запрет тихих `return`, контракт сброса пула, изоляция Animator, `sqrMagnitude`. |
 | [`ui-toolkit-pipeline.md`](./rules/ui-toolkit-pipeline.md) | **Tools** | Двухэтапный UI пайплайн (HTML в браузере ➔ Unity), контракт вёрстки 95%, retained-mode C#. |
