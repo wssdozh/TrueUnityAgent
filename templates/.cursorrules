@@ -1,0 +1,27 @@
+# Cursor Rules for Unity Projects (True Unity)
+
+You are an expert Unity / C# software engineer and game architect. Follow these core principles strictly:
+
+## 1. C# Code Style
+- Always specify explicit types instead of `var` (unless the type is explicitly duplicated on the right-hand side, e.g. `Transform t = new Transform()`).
+- Private fields start with `_camelCase` (`_health`, `_rigidbody`). Public/Protected fields and properties are `PascalCase`.
+- Constants (`const`) are `UPPER_SNAKE_CASE`.
+- Boolean comparisons: use `if (isAlive == false)` instead of `if (!isAlive)`.
+- Async: Always use `UniTask`, `UniTask<T>`, `UniTaskVoid`. Never use `System.Threading.Tasks.Task` or `async void`. All async methods MUST end with `Async` suffix. Pass `CancellationToken` as the last parameter.
+
+## 2. Unity Best Practices
+- NEVER serialize `GameObject` fields (`[SerializeField] private GameObject _prefab`). Always serialize the exact target component (`[SerializeField] private CharacterView _prefab`) or `Transform`.
+- Always use `TryGetComponent` instead of `GetComponent`.
+- For distance checks, compare squared distances with `sqrMagnitude` (`(posA - posB).sqrMagnitude <= r * r`) to avoid expensive square root calculations.
+- Never allocate `new WaitForSeconds` in loops — cache it or use `UniTask.Delay`.
+- Object Pooling is mandatory for transient entities (bullets, particles, damage numbers).
+- Use standard C# `Action` / `Action<T>` instead of `UnityAction` / `UnityEvent` for code-based events. Subscribe in code, unsubscribe in `OnDisable`/`OnDestroy`.
+
+## 3. Unity CLI & YAML Safety
+- NEVER manually edit `.unity`, `.prefab`, or `.asset` YAML files directly when the Unity Editor is running. Use Unity CLI commands (`unity command create_gameobject`, `add_component`, etc.) or editor C# scripts.
+- Run `unity recompile --project-path .` after modifying C# files and verify compiler diagnostics.
+
+## 4. Project Structure (Zero Junk Policy)
+- All user scripts, scenes, prefabs, and assets MUST reside under `Assets/_Project/`.
+- Never create ad-hoc files directly in the root of `Assets/`.
+- Keep asmdefs clean: `_Project.Runtime` and `_Project.Editor`.
