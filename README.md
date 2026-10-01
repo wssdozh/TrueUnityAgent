@@ -26,27 +26,15 @@
 
 ## Быстрый старт
 
-### 1. Подключи правила к проекту
-
-Запусти установщик в PowerShell, передав путь к корню своего Unity-проекта:
-
-```powershell
-.\install.ps1 -TargetPath "C:\Путь\К\Твоему\UnityПроекту"
-```
-
-*(Либо подключи как submodule: `git submodule add https://github.com/wssdozh/true-unity-agent.git .agents`)*
-
-Скрипт создаст структуру `.agents/rules/` и положит точки входа: `START.md`, `AGENTS.md`, `CLAUDE.md`, `.cursorrules`.
-
-### 2. Запусти адаптацию контекста
-
-Открой чат с агентом в своем проекте и отправь одну команду:
+Скинь этот промпт своему агенту (DSH, Claude Code, Cursor, Windsurf):
 
 ```text
-Прочитай START.md и адаптируй контекст под этот проект.
+Подключи правила из https://github.com/wssdozh/true-unity-agent в .agents, прочитай START.md и адаптируй контекст под этот проект.
 ```
 
-Агент сам прочитает `manifest.json` и `ProjectVersion.txt`, определит стек (URP, Input System, UniTask, DI/ECS), разметит границы папок `Assets/` и запишет готовый рабочий контекст в `AGENTS.md`.
+Агент сам подтянет правила, прочитает `manifest.json`, определит стек (URP, Input System, UniTask, DI/ECS), разметит границы папок `Assets/` и запишет готовый рабочий контекст в `AGENTS.md`.
+
+*(Либо локально через установщик: `.\install.ps1 -TargetPath "C:\Path\To\Project"`)*
 
 ---
 
