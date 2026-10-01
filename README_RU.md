@@ -14,7 +14,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/unity-6%2B-111111?style=flat-square" alt="Unity 6+">
-  <img src="https://img.shields.io/badge/агенты-DSH%20%C2%B7%20Claude%20%C2%B7%20Cursor-111111?style=flat-square" alt="Подходит для агентов">
+  <img src="https://img.shields.io/badge/агенты-автономные-111111?style=flat-square" alt="Автономные агенты">
   <img src="https://img.shields.io/badge/починка-первопричина-111111?style=flat-square" alt="Только первопричина">
   <img src="https://img.shields.io/badge/UI-контракт%2095%25-111111?style=flat-square" alt="Контракт UI 95%">
   <img src="https://img.shields.io/badge/лицензия-MIT-111111?style=flat-square" alt="Лицензия MIT">
@@ -22,7 +22,7 @@
 
 ---
 
-Кодекс архитектурных правил, инженерных стандартов и чек-листов для автономных ИИ-агентов (**DeepSeek Harness**, **Claude Code**, **Cursor**, **Windsurf**) в проектах на Unity 6+.
+Кодекс архитектурных правил, инженерных стандартов и чек-листов для автономных ИИ-агентов в проектах на Unity 6+.
 
 Заставляет агента писать минимальный рабочий C# код, искать первопричины багов вместо расстановки костылей и безопасно управлять редактором через официальный Unity CLI без повреждения файлов сцен и префабов.
 
@@ -30,7 +30,7 @@
 
 ## Быстрый старт
 
-Скинь этот промпт своему агенту (DSH, Claude Code, Cursor, Windsurf):
+Скинь этот промпт своему агенту:
 
 ```text
 Подключи правила из https://github.com/wssdozh/true-unity-agent в .agents, прочитай START.md и адаптируй контекст под этот проект.

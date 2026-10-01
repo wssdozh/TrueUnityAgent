@@ -1,6 +1,6 @@
 # CLAUDE.md — Universal Unity Project Agent Guide
 
-> Guide for Claude Code, DeepSeek Harness, and autonomous AI agents working on Unity projects.  
+> Guide for autonomous AI agents working on Unity projects.  
 > Primary source of truth: **`AGENTS.md`** and the **`.agents/rules/`** directory.
 
 ---

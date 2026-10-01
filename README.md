@@ -14,7 +14,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/unity-6%2B-111111?style=flat-square" alt="Unity 6+">
-  <img src="https://img.shields.io/badge/agents-DSH%20%C2%B7%20Claude%20%C2%B7%20Cursor-111111?style=flat-square" alt="Agent Ready">
+  <img src="https://img.shields.io/badge/agents-autonomous-111111?style=flat-square" alt="Autonomous Agents">
   <img src="https://img.shields.io/badge/fixing-root--cause-111111?style=flat-square" alt="Root Cause Fixes Only">
   <img src="https://img.shields.io/badge/UI-contract%2095%25-111111?style=flat-square" alt="UI Contract 95%">
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT License">
@@ -22,7 +22,7 @@
 
 ---
 
-Architecture rules, engineering standards, and checklists for autonomous AI agents (**DeepSeek Harness**, **Claude Code**, **Cursor**, **Windsurf**) in Unity 6+ projects.
+Architecture rules, engineering standards, and checklists for autonomous AI agents in Unity 6+ projects.
 
 Enforces minimal working C# code, mandates root-cause fixes over superficial null checks, and drives the editor safely via the official Unity CLI without corrupting scene or prefab YAML files.
 
@@ -30,7 +30,7 @@ Enforces minimal working C# code, mandates root-cause fixes over superficial nul
 
 ## Quickstart
 
-Send this prompt to your AI agent (DSH, Claude Code, Cursor, Windsurf):
+Send this prompt to your AI agent:
 
 ```text
 Include rules from https://github.com/wssdozh/true-unity-agent into .agents, read START.md, and adapt project context for this repository.
