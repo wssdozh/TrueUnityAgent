@@ -5,6 +5,22 @@
 
 ---
 
+## ⚡ Lazy Context Loading Rule (Strict JIT)
+
+**Do NOT load or read all rule files upfront.**  
+Every token in your context window costs latency and reasoning depth. Read **only** the exact rule file required for the active step, neither more nor less:
+
+- **Writing / editing C# scripts**: read `code-style.md` (+ `architecture-design.md` if designing services/factories).
+- **Manipulating scenes, prefabs, or baking**: read `unity-cli.md`.
+- **Planning / clarifying a new feature**: read `readiness-and-delivery.md`.
+- **Working on UI Toolkit**: read `ui-toolkit-pipeline.md`.
+- **Handling memory, pooling, or Unity lifecycle**: read `unity-best-practices.md`.
+- **Making Git commits or branches**: read `git-workflow.md`.
+
+*Never batch-read unneeded rules speculatively.*
+
+---
+
 ## Rule Routing (`.agents/rules/`)
 
 ### 1. Workflow & Safety
