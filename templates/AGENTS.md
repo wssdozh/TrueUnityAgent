@@ -5,19 +5,20 @@
 
 ---
 
-## ⚡ Lazy Context Loading Rule (Strict JIT)
+## ⚡ Task-Driven Context Loading (Strict JIT)
 
-**Do NOT load or read all rule files upfront.**  
-Every token in your context window costs latency and reasoning depth. Read **only** the exact rule file required for the active step, neither more nor less:
+**Do NOT read all rules upfront.**  
+Every token in your context window costs latency and reasoning depth. Read only the specific rule files directly required for the current task, no more, no less:
 
-- **Writing / editing C# scripts**: read `code-style.md` (+ `architecture-design.md` if designing services/factories).
-- **Manipulating scenes, prefabs, or baking**: read `unity-cli.md`.
-- **Planning / clarifying a new feature**: read `readiness-and-delivery.md`.
-- **Working on UI Toolkit**: read `ui-toolkit-pipeline.md`.
-- **Handling memory, pooling, or Unity lifecycle**: read `unity-best-practices.md`.
-- **Making Git commits or branches**: read `git-workflow.md`.
+- **C# gameplay / code**: read `code-style.md` (+ `architecture-design.md` if creating new classes/factories/interfaces).
+- **Unity Engine lifecycle, memory, pooling**: read `unity-best-practices.md`.
+- **Unity Editor actions (scenes, prefabs, baking)**: read `unity-cli.md`.
+- **Planning / feature alignment**: read `readiness-and-delivery.md`.
+- **Bugs / crashes**: read `anti-deadlock.md` (root-cause diagnosis).
+- **UI Toolkit**: read `ui-toolkit-pipeline.md`.
+- **Git commits / PRs**: read `git-workflow.md`.
 
-*Never batch-read unneeded rules speculatively.*
+*Combine only the modules the active task touches. Never batch-read unused files.*
 
 ---
 
